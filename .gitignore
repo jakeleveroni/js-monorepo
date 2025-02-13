@@ -1,3 +1,2 @@
-main.wasm
-src/zig-cache/
-.spin/
+**/src/zig-cache/
+**/.spin/
