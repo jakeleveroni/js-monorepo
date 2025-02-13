@@ -8,7 +8,7 @@ pub fn build(b: *std.Build) !void {
 fn buildFetch(b: *std.Build) !void {
     const exe = b.addExecutable(.{
         .name = "fetch-git-repos", // Output file name
-        .root_source_file = b.path("src/fetch-git-function.zig"), // Main function file
+        .root_source_file = b.path("src/zig/fetch-git-function.zig"), // Main function file
         .target = b.standardTargetOptions(.{
             .default_target = .{ .cpu_arch = .wasm32, .os_tag = .wasi }, // Compile for WebAssembly WASI
         }),
@@ -27,7 +27,7 @@ fn buildFetch(b: *std.Build) !void {
 }
 
 fn buildWasm(b: *std.Build) !void {
-    const src_dir = "src";
+    const src_dir = "src/zig";
     // const out_dir_path = "zerger/functions";
 
     var dir = try std.fs.cwd().openDir(src_dir, .{ .iterate = true });
