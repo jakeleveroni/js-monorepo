@@ -1,0 +1,19 @@
+spin_manifest_version = 2
+
+[application]
+name = "zergerless"
+version = "0.1.0"
+authors = ["levdev"]
+description = "A serverless backend template for zig built on spin"
+
+[[trigger.http]]
+route = "/zerg"
+component = "zergerless"
+executor = { type = "wagi" }
+
+[component.zergerless]
+source = "zig-out/bin/zerger.wasm"
+allowed_outbound_hosts = []
+[component.zergerless.build]
+command = "zig build-exe -O ReleaseSmall -target wasm32-wasi src/main.zig"
+watch = ["src/**/*.zig"]
