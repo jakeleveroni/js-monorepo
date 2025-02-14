@@ -2,7 +2,7 @@
     "name": "codemosis",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "src/ecmascript/index.js",
     "scripts": {
         "build": "knitwit --out-dir build/wit/knitwit --out-world combined && npx webpack --mode=production && npx mkdirp dist && npx j2w -i build/bundle.js -d build/wit/knitwit -n combined -o dist/codemosis.wasm",
         "test": "echo \"Error: no test specified\" && exit 1"
