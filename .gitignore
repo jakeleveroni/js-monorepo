@@ -1,6 +1,7 @@
-**/zig-cache/
+**/.zig-cache/
 **/.spin/
 **/zig-out/
+!/zig-out/.gitkeep
 **/node_modules
 **/build
 **/dist

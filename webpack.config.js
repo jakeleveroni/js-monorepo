@@ -2,7 +2,7 @@ const path = require("path");
 const SpinSdkPlugin = require("@fermyon/spin-sdk/plugins/webpack");
 
 module.exports = {
-  entry: "./src/ecmascript/fetch-active-git-repos.ts",
+  entry: "./src/functions/ecmascript/fetch-active-git-repos.ts",
   experiments: {
     outputModule: true,
   },
@@ -19,7 +19,7 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"],
   },
   output: {
-    path: path.resolve(__dirname, "./build"),
+    path: path.resolve(__dirname, "./out/build"),
     filename: "bundle.js",
     module: true,
     library: {

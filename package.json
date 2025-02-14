@@ -2,9 +2,9 @@
     "name": "codemosis",
     "version": "1.0.0",
     "description": "",
-    "main": "src/ecmascript/index.js",
+    "main": "src/functions/ecmascript/fetch-active-git-repos.js",
     "scripts": {
-        "build": "knitwit --out-dir build/wit/knitwit --out-world combined && npx webpack --mode=production && npx mkdirp dist && npx j2w -i build/bundle.js -d build/wit/knitwit -n combined -o dist/codemosis.wasm",
+        "build": "knitwit --out-dir out/build/wit/knitwit --out-world combined && npx webpack --mode=production && npx mkdirp dist && npx j2w -i out/build/bundle.js -d out/build/wit/knitwit -n combined -o out/dist/codemosis.wasm",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],
