@@ -3,7 +3,7 @@ import logger from "../utils/logger";
 import type { RequestHandler } from "express";
 
 const authMiddleware: RequestHandler = async (req, res, next) => {
-  const token = req.headers.authorization;
+  const token = req.cookies.auth_token;
   if (!token) {
     res.status(401).json({ message: "Not authorized." });
     return;

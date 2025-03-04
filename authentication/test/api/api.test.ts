@@ -1,14 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll, mock } from "bun:test";
 import request from "supertest";
 import app from "../../server";
-import { mockDatabasePool } from "./utils/mock-db-pool";
 
 let server: any;
 
-mock.module("../../src/utils/db-pool", mockDatabasePool);
-
 beforeAll(() => {
-  server = app.locals.listen(3001);
+  server = app.listen(3001);
 });
 
 afterAll(() => {
@@ -17,11 +14,29 @@ afterAll(() => {
 
 describe("authentication api tests", () => {
   it("can register user", async () => {
-    const response = await request(server)
+    await request(server)
       .post("/api/register")
       .send({ username: "testuser", password: "testpassword123" })
-      .set("Accept", "application/json");
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual({ message: "Account created" });
+      .set("Accept", "application/json")
+      .expect(200)
+      .then(response => {
+        expect(response.body).toEqual({ message: "registered" });
+     })
+  });
+
+  it("registered users can login", async () => {
+    await request(server)
+      .post("/api/login")
+      .send({ username: "testuser", password: "testpassword123" })
+      .set("Accept", "application/json")
+      .expect(200)
+      .then(response => {
+        // @ts-expect-error -- they typed the headers wrong, cookies is a string array
+        const cookies = response.headers['set-cookie'] as string[];
+        expect(cookies.join('')).toInclude('auth_token')
+        expect(cookies.join('')).toInclude('refresh_token')
+        expect(cookies).toHaveLength(2)
+        expect(response.body).toEqual({ message: "authorized" });
+      })
   });
 });

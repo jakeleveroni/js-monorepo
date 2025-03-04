@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import jwt, { type JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import pool from "../../utils/db-pool";
 import logger from "../../utils/logger";
 import type { RequestHandler } from "express";
@@ -30,7 +30,7 @@ const login: RequestHandler<
   }
 
   const user = rSet.rows[0];
-  const { password: hashedPassword, salt } = user;
+  const { password: hashedPassword } = user;
 
   const hashMatch = await bcrypt.compare(password, hashedPassword);
   if (!hashMatch) {
@@ -46,12 +46,14 @@ const login: RequestHandler<
     return;
   }
 
+  console.log('JAKE', process.env)
+
   // callback hell because jwt isnt es6 async
   // generate access token
   jwt.sign(
     { username },
     process.env.JWT_SECRET,
-    { algorithm: "RS256", expiresIn: "1h" },
+    { expiresIn: "1h" },
     function (err, token) {
       if (err) {
         logger.error(err, "Token generation failed");
@@ -67,7 +69,7 @@ const login: RequestHandler<
       jwt.sign(
         { username },
         process.env.JWT_REFRESH_SECRET!,
-        { algorithm: "RS256", expiresIn: "4h" },
+        { expiresIn: "4h" },
         async function (refreshErr, refreshToken) {
           if (refreshErr) {
             logger.error(refreshErr, "Refresh token generation failed");
@@ -98,14 +100,19 @@ const login: RequestHandler<
             client.release();
           }
 
-          // set refresh token as cookie header
-          res.cookie("refreshToken", refreshToken, {
+          // set tokens into cookie headers
+          res.cookie('auth_token', token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+          })
+          res.cookie("refresh_token", refreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: "strict",
           });
-          // set token in response body
-          res.status(200).json({ message: "Authorized", data: token });
+
+          res.status(200).json({ message: "authorized" });
         },
       );
     },
@@ -114,7 +121,6 @@ const login: RequestHandler<
 
 const refresh: RequestHandler = async (req, res, next) => {
   const refreshToken = req.cookies.refreshToken;
-  const client = await pool.connect();
 
   if (!process.env.JWT_REFRESH_SECRET || !process.env.JWT_SECRET) {
     res.status(500).json({
@@ -129,12 +135,14 @@ const refresh: RequestHandler = async (req, res, next) => {
     return;
   }
 
+  const client = await pool.connect();
   const rSet = await client.query<{ token: string }>(
     "SELECT token FROM refresh_tokens where token = $1",
     [refreshToken],
   );
 
   if (rSet.rows.length === 0) {
+    client.release();
     res.status(403).json({ message: "Not authorized.", code: ERRS.CGQL_0009 });
     return;
   }
@@ -186,6 +194,20 @@ const refresh: RequestHandler = async (req, res, next) => {
     },
   );
 };
+
+const logout: RequestHandler = async (req, res, next) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  if (!refreshToken) {
+    res.status(404).json({ message: 'No refresh token' })
+  }
+
+  const client = await pool.connect();
+  await client.query(`DELELTE FROM refresh_tokens WHERE token = $1`, [refreshToken]);
+  res.clearCookie('auth_token');
+  res.clearCookie('refresh_token');
+  
+}
 
 const ERRS = {
   CGQL_0000: "CGQL-0000",

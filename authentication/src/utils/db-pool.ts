@@ -1,6 +1,9 @@
 import { Pool } from "pg";
 import logger from "./logger";
 
+console.log('HERE')
+debugger;
+
 const pool = new Pool({
   user: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,

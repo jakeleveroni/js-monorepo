@@ -1,0 +1,6 @@
+[test]
+# Load these modules before running tests.
+preload = [
+    "./test/api/utils/env-mock.ts", 
+    "./test/api/utils/db-mock.ts",
+]
