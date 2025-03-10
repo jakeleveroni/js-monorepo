@@ -4,12 +4,14 @@ import pool from "../../utils/db-pool";
 import logger from "../../utils/logger";
 import type { RequestHandler } from "express";
 import type { UserRecord } from "../../types/db-types";
+import type { JwtTokenContent } from "../../types/token-types";
+import type { StringValue } from "ms";
 
 const login: RequestHandler<
   unknown,
   unknown,
   { username?: string; password?: string }
-> = async (req, res, next) => {
+> = async (req, res) => {
   const { username, password } = req.body;
   const client = await pool.connect();
 
@@ -46,14 +48,13 @@ const login: RequestHandler<
     return;
   }
 
-  console.log('JAKE', process.env)
-
   // callback hell because jwt isnt es6 async
   // generate access token
   jwt.sign(
-    { username },
+    // TODO fetch roles and encode here
+    { username, roles: []} satisfies JwtTokenContent,
     process.env.JWT_SECRET,
-    { expiresIn: "1h" },
+    { expiresIn: process.env.JWT_EXPIRE_TIME as StringValue ?? '1h' },
     function (err, token) {
       if (err) {
         logger.error(err, "Token generation failed");
@@ -69,7 +70,7 @@ const login: RequestHandler<
       jwt.sign(
         { username },
         process.env.JWT_REFRESH_SECRET!,
-        { expiresIn: "4h" },
+        { expiresIn: process.env.JWT_REFRESH_EXPIRE_TIME as StringValue ?? '4h' },
         async function (refreshErr, refreshToken) {
           if (refreshErr) {
             logger.error(refreshErr, "Refresh token generation failed");
@@ -119,7 +120,7 @@ const login: RequestHandler<
   );
 };
 
-const refresh: RequestHandler = async (req, res, next) => {
+const refresh: RequestHandler = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
   if (!process.env.JWT_REFRESH_SECRET || !process.env.JWT_SECRET) {
@@ -188,7 +189,12 @@ const refresh: RequestHandler = async (req, res, next) => {
             return;
           }
 
-          res.status(200).json({ message: "Authenticated", data: newToken });
+          res.cookie('refresh_token', newToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+          })
+          res.status(200).json({ message: "authenticated" });
         },
       );
     },
