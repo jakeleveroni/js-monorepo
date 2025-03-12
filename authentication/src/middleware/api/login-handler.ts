@@ -48,13 +48,20 @@ const login: RequestHandler<
     return;
   }
 
+  const now = Date.now();
   // callback hell because jwt isnt es6 async
   // generate access token
   jwt.sign(
     // TODO fetch roles and encode here
     { username, role } satisfies JwtTokenContent,
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRE_TIME as StringValue ?? '1h' },
+    { 
+      expiresIn: process.env.JWT_EXPIRE_TIME as StringValue ?? '1h',
+      audience: process.env.JWT_AUDIENCE ?? 'manwithnoname',
+      issuer: process.env.JWT_ISSUER ?? 'manwithnonametoo',
+      jwtid: crypto.randomUUID(),
+      subject: username
+    },
     function (err, token) {
       if (err) {
         logger.error(err, "Token generation failed");
@@ -70,7 +77,13 @@ const login: RequestHandler<
       jwt.sign(
         { username },
         process.env.JWT_REFRESH_SECRET!,
-        { expiresIn: process.env.JWT_REFRESH_EXPIRE_TIME as StringValue ?? '4h' },
+        { 
+          expiresIn: process.env.JWT_EXPIRE_TIME as StringValue ?? '4h',
+          audience: process.env.JWT_AUDIENCE,
+          issuer: process.env.JWT_ISSUER,
+          jwtid: crypto.randomUUID(),
+          subject: username
+        },
         async function (refreshErr, refreshToken) {
           if (refreshErr) {
             logger.error(refreshErr, "Refresh token generation failed");

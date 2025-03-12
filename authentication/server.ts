@@ -8,6 +8,7 @@ import authMiddleware from "./src/middleware/auth-middleware";
 import permissionsMiddleware from "./src/middleware/permissions-middleware";
 import logger from "./src/utils/logger";
 import isDev from "./src/utils/is-dev";
+import { replayMitigationMiddleware } from "./src/middleware/replay-mitigation-middleware";
 
 const port = Number(process.env.SERVER_PORT ?? 3010);
 const hostname = process.env.SERVER_HOSTNAME ?? "localhost";
@@ -25,6 +26,7 @@ app.post("/api/login", LoginHandlers.login);
 app.post("/api/logout", LoginHandlers.logout);
 
 // register secure routes after the auth middleware
+app.use("/api/s/*", replayMitigationMiddleware);
 app.use("/api/s/*", authMiddleware);
 app.use("/api/s/*", permissionsMiddleware);
 
