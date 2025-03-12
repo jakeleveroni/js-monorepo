@@ -4,8 +4,8 @@ import cookieParser from "cookie-parser";
 import RegisterHandlers from "./src/middleware/api/register-handlers";
 import LoginHandlers from "./src/middleware/api/login-handler";
 import errorHandlerMiddleware from "./src/middleware/error-handler-middleware";
-import loggingMiddleware from "./src/middleware/logging-middleware";
 import authMiddleware from "./src/middleware/auth-middleware";
+import permissionsMiddleware from "./src/middleware/permissions-middleware";
 import logger from "./src/utils/logger";
 import isDev from "./src/utils/is-dev";
 
@@ -22,9 +22,11 @@ app.use(cookieParser());
 // register insecure routes
 app.post("/api/register", RegisterHandlers.registerUser);
 app.post("/api/login", LoginHandlers.login);
+app.post("/api/logout", LoginHandlers.logout);
 
 // register secure routes after the auth middleware
 app.use("/api/s/*", authMiddleware);
+app.use("/api/s/*", permissionsMiddleware);
 
 // dont expose this in production without need
 if (isDev()) {

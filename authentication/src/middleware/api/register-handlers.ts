@@ -1,16 +1,14 @@
-import bcrypt from "bcryptjs";
-import type { RequestHandler } from "express";
 import logger from "../../utils/logger";
 import { saltAndHashPassword } from "../../utils/hash-password";
 import pool from "../../utils/db-pool";
 import isDev from "../../utils/is-dev";
+import type { RequestHandler } from "express";
 
 const registerUser: RequestHandler<
   unknown,
   unknown,
   { username?: string; password?: string }
-> = async (req, res, next) => {
-  logger.info(req.body, "request body");
+> = async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
     res.status(400).json({ message: "missing username and password" });
@@ -18,19 +16,12 @@ const registerUser: RequestHandler<
   }
   try {
     const { salt, hashed } = await saltAndHashPassword(username, password);
-    logger.info("START CONNECT");
     const client = await pool.connect();
-    logger.info("CONNECTED");
 
     const rSet = await client.query(
-      "INSERT INTO USERS (username, password, salt) VALUES ($1, $2, $3) RETURNING id",
+      "INSERT INTO USERS (username, password, salt, role_id) VALUES ($1, $2, $3, (SELECT id FROM roles WHERE name = 'user')) RETURNING id",
       [username, hashed, salt],
     );
-
-    logger.debug({
-      "result-count": rSet.rows.length,
-      sql: rSet.command,
-    });
 
     if (rSet.rows.length > 0) {
       res.status(200).json({ message: "registered" });

@@ -21,8 +21,8 @@ const login: RequestHandler<
       .json({ message: "missing username or password.", code: ERRS.CGQL_0000 });
     return;
   }
-  const rSet = await client.query<UserRecord>(
-    "SELECT * FROM users WHERE username = $1",
+  const rSet = await client.query<Pick<UserRecord, 'username' | 'password' | 'role'>>(
+    "SELECT u.username, u.password, r.name as role FROM users u LEFT JOIN roles r ON u.role_id = r.id WHERE username = $1",
     [username],
   );
 
@@ -32,7 +32,7 @@ const login: RequestHandler<
   }
 
   const user = rSet.rows[0];
-  const { password: hashedPassword } = user;
+  const { password: hashedPassword, role } = user;
 
   const hashMatch = await bcrypt.compare(password, hashedPassword);
   if (!hashMatch) {
@@ -52,7 +52,7 @@ const login: RequestHandler<
   // generate access token
   jwt.sign(
     // TODO fetch roles and encode here
-    { username, roles: []} satisfies JwtTokenContent,
+    { username, role } satisfies JwtTokenContent,
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRE_TIME as StringValue ?? '1h' },
     function (err, token) {
@@ -166,53 +166,89 @@ const refresh: RequestHandler = async (req, res) => {
           logger.error(err, "Unable to remove refresh token");
         } finally {
           client.release();
+          res.status(error ? 500 : 401).json({
+            message: "Unable to authenticate at this time.",
+            code: ERRS.CGQL_0010,
+          });
+          return;
         }
-        res.status(error ? 500 : 401).json({
-          message: "Unable to authenticate at this time.",
-          code: ERRS.CGQL_0010,
-        });
-        return;
       }
 
-      jwt.sign(
-        { username: decoded.username },
-        process.env.JWT_SECRET!,
-        { algorithm: "RS256", expiresIn: "1h" },
-        function (error, newToken) {
-          if (error || !newToken) {
-            logger.error(error, "Unable to generate new access token.");
-            client.release();
-            res.send(500).json({
-              message: "Unable to authenticate at this time.",
-              code: ERRS.CGQL_0011,
-            });
+      try {
+        const userRSet = await client.query<Pick<UserRecord, 'username' | 'role'>>(`
+          SELECT u.username, r.name as role 
+            FROM users u 
+              LEFT JOIN roles r ON u.role_id = r.id 
+            WHERE username = $1
+        `, [decoded.username]);
+  
+        if (userRSet.rowCount !== 1) {
+          client.release();
+          logger.debug(userRSet, 'Decoded token user lookup failed')
+          res.status(400).json({ message: "login failed" })
+          return;
+        }
+        
+        // sign new auth token
+        jwt.sign(
+          userRSet.rows[0],
+          process.env.JWT_SECRET!,
+          { algorithm: "RS256", expiresIn: "1h" },
+          function (error, newToken) {
+            if (error || !newToken) {
+              logger.error(error, "Unable to generate new access token.");
+              client.release();
+              res.send(500).json({
+                message: "Unable to authenticate at this time.",
+                code: ERRS.CGQL_0011,
+              });
+              return;
+            }
+  
+            // send user new auth token
+            res.cookie('auth_token', newToken, {
+              httpOnly: true,
+              secure: true,
+              sameSite: "strict",
+            })
+            res.status(200).json({ message: "authenticated" });
             return;
-          }
-
-          res.cookie('refresh_token', newToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "strict",
-          })
-          res.status(200).json({ message: "authenticated" });
-        },
-      );
+          },
+        );
+      } catch (err) {
+        // if refresh fails delete any remaining refresh token associated with failed exchange
+        try {
+          logger.error(err, 'Failed to refresh')
+          await client.query("DELETE FROM refresh_tokens WHERE token = $1", [refreshToken]);
+        } catch (err) {
+          logger.error(err, "Unable to remove refresh token");
+        } finally {
+          client.release();
+          res.status(error ? 500 : 401).json({
+            message: "Unable to authenticate at this time.",
+          });
+          return;
+        }
+      }
     },
   );
 };
 
 const logout: RequestHandler = async (req, res, next) => {
   const refreshToken = req.cookies.refreshToken;
+  const authToken = req.cookies.authToken;
 
-  if (!refreshToken) {
-    res.status(404).json({ message: 'No refresh token' })
+  if (!refreshToken || !authToken) {
+    res.status(404).json({ message: 'No refresh token' });
+    return;
   }
 
   const client = await pool.connect();
   await client.query(`DELELTE FROM refresh_tokens WHERE token = $1`, [refreshToken]);
+
   res.clearCookie('auth_token');
   res.clearCookie('refresh_token');
-  
+  res.status(200).json({ message: 'logged out' });
 }
 
 const ERRS = {
@@ -232,5 +268,6 @@ const ERRS = {
 
 export default {
   login,
+  logout,
   refresh,
 };

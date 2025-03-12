@@ -1,4 +1,4 @@
 export type JwtTokenContent = {
     username: string;
-    roles: string[]
+    role: string;
 }
