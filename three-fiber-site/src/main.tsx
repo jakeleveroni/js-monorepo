@@ -2,26 +2,27 @@ import { createRoot } from "react-dom/client";
 import { useRef, useState } from "react";
 import { useFrame, Canvas } from "@react-three/fiber";
 import type { ThreeElements } from "@react-three/fiber";
-import type { Mesh } from "three";
+import { Vector3, type Mesh } from "three";
 import "./styles.css";
+import { RoundedBoxGeometry } from "./geometry/rounded-box-geometry";
 
 function Box(props: ThreeElements["mesh"]) {
 	// biome-ignore lint/style/noNonNullAssertion: is immediate set to mesh element ref
 	const meshRef = useRef<Mesh>(null!);
 	const [hovered, setHover] = useState(false);
 	const [active, setActive] = useState(false);
-	useFrame((_, delta) => (meshRef.current.rotation.x += delta));
+	useFrame((_, delta) => (meshRef.current.rotation.y += delta));
 	return (
 		<mesh
 			{...props}
 			ref={meshRef}
-			scale={active ? 1.5 : 1}
+			scale={active ? new Vector3(2, 1, 1) : 1}
 			onClick={() => setActive(!active)}
 			onPointerOver={() => setHover(true)}
 			onPointerOut={() => setHover(false)}
 		>
-			<boxGeometry args={[1, 1, 1]} />
-			<meshStandardMaterial color={hovered ? "hotpink" : "#2f74c0"} />
+			<primitive object={new RoundedBoxGeometry(4, 0.5, 5, 4, 0.15)} />
+			<meshStandardMaterial color={hovered ? "hotpink" : "#4bdb98"} />
 		</mesh>
 	);
 }
@@ -37,8 +38,7 @@ createRoot(document.getElementById("root")!).render(
 			decay={0}
 			intensity={Math.PI}
 		/>
-		<pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
-		<Box position={[-1.2, 0, 0]} />
-		<Box position={[1.2, 0, 0]} />
+		<pointLight position={[-10, -15, -10]} decay={0} intensity={Math.PI} />
+		<Box position={[0, 0, 0]} rotation={[0.3, 0, 0]} />
 	</Canvas>,
 );
