@@ -7,11 +7,12 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": []
+    "ignore": [],
+    "include": ["./authentication/**", "./three-fiber-site/**"]
   },
   "formatter": {
     "enabled": true,
-    "indentStyle": "tab"
+    "indentStyle": "space"
   },
   "organizeImports": {
     "enabled": true
@@ -27,7 +28,15 @@
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "double"
+      "quoteStyle": "single",
+      "enabled": true,
+      "semicolons": "always",
+      "lineWidth": 100
+    }
+  },
+  "json": {
+    "parser": {
+      "allowComments": true
     }
   }
 }
