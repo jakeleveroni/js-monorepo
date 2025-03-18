@@ -3,8 +3,11 @@
   "version": "0.0.1",
   "name": "codemosis",
   "workspaces": [
-    "./projects/**"
+    "js-monorepo/*"
   ],
+  "scripts": {
+    "ws": "bun ./scripts/bun/workspace.ts"
+  },
   "dependencies": {},
   "devDependencies": {
     "@biomejs/biome": "^1.9.4"

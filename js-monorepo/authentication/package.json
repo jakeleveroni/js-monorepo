@@ -1,6 +1,9 @@
 {
   "name": "authentication",
   "module": "server.ts",
+  "alias": [
+    "auth"
+  ],
   "type": "module",
   "devDependencies": {
     "@types/bun": "^1.2.2",
