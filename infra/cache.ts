@@ -1,4 +1,4 @@
-import { file, write, Glob } from "bun";
+import { file, write } from "bun";
 import getRootDir from "./get-root-dir";
 
 export type CacheRecord<T> = T & {
@@ -20,41 +20,40 @@ export type PackageJSON = {
   optionalDependencies?: Record<string, string>;
 };
 
-/**
- * @throws - throws error if file fails to open or does not exist
- */
-async function cachePackageJsons() {
-  const rootPkgJson: PackageJSON = await file(
-    `${getRootDir()}/package.json`
-  ).json();
-  const originalWorkspaces = rootPkgJson.workspaces ?? [];
-  const explodedWorkspaces: PackageJSON["indexedWorkspaces"] = [];
+// HOC method to cache the cache in memory on resource first aquisition
+export function getCacheRecord<T extends CacheRecord<unknown>>(): (
+  key: string
+) => Promise<T | undefined> {
+  let cache = undefined;
 
-  originalWorkspaces.forEach(async (ws) => {
-    const glob = new Glob(ws);
-
-    for (const file of glob.scanSync({
-      cwd: getRootDir(),
-      onlyFiles: false,
-    })) {
-      explodedWorkspaces.push({
-        name: file.split("/")[1],
-        cwd: `${getRootDir()}/${file}`,
-      });
+  return async (key: string) => {
+    if (cache) {
+      return cache;
     }
-  });
 
-  const modifiedPkgJson: CacheRecord<PackageJSON> = {
-    ...rootPkgJson,
-    indexedWorkspaces: explodedWorkspaces,
-    key: "root-pkg-json",
-    updated: Date.now(),
+    const rootDir = getRootDir();
+    const cachePath = `${rootDir}/.bunrepo/.cache`;
+
+    const fd = file(cachePath);
+    const stats = await fd.stat();
+
+    if (!stats.isFile()) {
+      console.error("Unable to cache record");
+      return;
+    }
+
+    const contents = await fd.json();
+    cache = contents;
+
+    if (!contents || !contents[key]) {
+      return undefined;
+    }
+
+    return contents[key] as T satisfies T;
   };
-
-  await cacheRecord(modifiedPkgJson);
 }
 
-async function cacheRecord<T extends CacheRecord<unknown>>(record: T) {
+export async function cacheRecord<T extends CacheRecord<unknown>>(record: T) {
   const rootDir = getRootDir();
   const cachePath = `${rootDir}/.bunrepo/.cache`;
 
@@ -63,6 +62,7 @@ async function cacheRecord<T extends CacheRecord<unknown>>(record: T) {
 
   if (!stats.isFile()) {
     console.error("Unable to cache record");
+    return;
   }
 
   const contents = await fd.json();

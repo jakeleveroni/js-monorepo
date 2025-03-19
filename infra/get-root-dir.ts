@@ -1,5 +1,5 @@
 function memoizedRootDir() {
-  let cache = undefined;
+  let cache: string | undefined = undefined;
 
   return () => {
     if (cache) {
@@ -19,6 +19,7 @@ function memoizedRootDir() {
 
     const nestedDepth = dirParts.length - 1 - rootIndex;
     const rootDir = "/" + dirParts.slice(0, -nestedDepth).join("/");
+    cache = rootDir;
     return rootDir;
   };
 }
