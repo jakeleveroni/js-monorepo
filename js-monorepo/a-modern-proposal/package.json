@@ -1,5 +1,9 @@
 {
   "name": "a-modern-proposal",
+  "aliases": [
+    "mp",
+    "modprop"
+  ],
   "type": "module",
   "version": "0.0.1",
   "scripts": {

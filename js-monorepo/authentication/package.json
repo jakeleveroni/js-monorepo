@@ -1,5 +1,8 @@
 {
   "name": "authentication",
+  "aliases": [
+    "auth"
+  ],
   "module": "server.ts",
   "alias": [
     "auth"

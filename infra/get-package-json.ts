@@ -1,12 +1,26 @@
 import { file, Glob } from "bun";
-import { cacheRecord, CacheRecord, PackageJSON } from "./cache";
 import getRootDir from "./get-root-dir";
+
+export type PackageJSON = {
+  name: string;
+  aliases: string[];
+  version: string;
+  description?: string;
+  main?: string;
+  scripts?: Record<string, string>;
+  workspaces?: string[];
+  indexedWorkspaces?: Array<{ name: string; cwd: string; aliases: string[] }>;
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+  optionalDependencies?: Record<string, string>;
+};
 
 /**
  * HOC method that reads in package.json & caches it, on subsequent calls the cached version is returne
  */
 export function getPackageJson() {
-  let cache: Record<string, CacheRecord<PackageJSON>> = {};
+  let cache: Record<string, PackageJSON> = {};
 
   /**
    * returns a cached version of the package json if available
@@ -15,43 +29,38 @@ export function getPackageJson() {
    * @throws throws Error if file fails to open or does not exist
    */
   return async function packageJson(
-    cwd: string = ""
-  ): Promise<CacheRecord<PackageJSON>> {
+    cwd: string = getRootDir()
+  ): Promise<PackageJSON> {
     if (cache[cwd]) {
       return cache[cwd];
     }
-
-    const rootPkgJson: PackageJSON = await file(
-      `${getRootDir()}${cwd}/package.json`
-    ).json();
-    const originalWorkspaces = rootPkgJson.workspaces ?? [];
+    const pkgJson: PackageJSON = await file(`${cwd}/package.json`).json();
+    const originalWorkspaces = pkgJson.workspaces ?? [];
     const explodedWorkspaces: PackageJSON["indexedWorkspaces"] = [];
 
-    originalWorkspaces.forEach(async (ws) => {
+    for (const ws of originalWorkspaces) {
       const glob = new Glob(ws);
 
-      for (const file of glob.scanSync({
+      for await (const pathMatch of glob.scan({
         cwd: getRootDir(),
         onlyFiles: false,
       })) {
+        const wsPkgJson = await packageJson(`${getRootDir()}/${pathMatch}`);
+
         explodedWorkspaces.push({
-          name: file.split("/")[1],
-          cwd: `${getRootDir()}/${file}`,
+          name: pathMatch.split("/")[1],
+          cwd: `${getRootDir()}/${pathMatch}`,
+          aliases: wsPkgJson.aliases ?? [],
         });
       }
-    });
+    }
 
-    const modifiedPkgJson: CacheRecord<PackageJSON> = {
-      ...rootPkgJson,
+    const modifiedPkgJson: PackageJSON = {
+      ...pkgJson,
       indexedWorkspaces: explodedWorkspaces,
-      key: "root-pkg-json",
-      updated: Date.now(),
     };
 
     cache[cwd] = modifiedPkgJson;
-    cacheRecord(modifiedPkgJson).catch(() =>
-      console.error("Unable to cache package.json")
-    );
     return modifiedPkgJson;
   };
 }

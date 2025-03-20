@@ -23,6 +23,9 @@
       "recommended": true,
       "suspicious": {
         "noAssignInExpressions": "info"
+      },
+      "style": {
+        "useNodejsImportProtocol": "off"
       }
     }
   },
