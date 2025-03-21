@@ -7,21 +7,9 @@ authors = ["levdev"]
 description = "A serverless backend template for zig built on spin"
 
 [[trigger.http]]
-route = "/zerg"
-component = "zergerless"
-executor = { type = "wagi" }
-
-[[trigger.http]]
 route = "/osmo"
 component = "codemosis"
 executor = { type = "wagi" }
-
-[component.zergerless]
-source = "zig-out/bin/main.wasm"
-allowed_outbound_hosts = []
-[component.zergerless.build]
-command = "zig build-exe -O ReleaseSmall -femit-bin=zig-out/main -target wasm32-wasi src/funcions/zig/main.zig"
-watch = ["src/funcions/zig/main.zig"]
 
 [component.codemosis]
 source = "dist/codemosis.wasm"
@@ -29,4 +17,4 @@ exclude_files = ["**/node_modules"]
 allowed_outbound_hosts = ["https://api.github.com"]
 [component.codemosis.build]
 command = ["npm install", "npm run build"]
-watch = ["src/functions/ecmascript/**/*.ts"]
+watch = ["src/functions/fetch-active-git-repos.ts"]

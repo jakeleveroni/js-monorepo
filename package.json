@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "name": "codemosis",
   "workspaces": [
-    "js-monorepo/*"
+    "projects/*"
   ],
   "scripts": {
     "ws": "bun ./scripts/bun/workspace.ts"

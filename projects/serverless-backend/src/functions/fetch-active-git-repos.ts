@@ -2,7 +2,7 @@
 import { AutoRouter, json } from "itty-router";
 import type { IRequest, RequestHandler } from "itty-router";
 
-let router = AutoRouter();
+const router = AutoRouter();
 
 type FetchActiveGitRepoParams = IRequest & {
   params: {
@@ -14,12 +14,12 @@ type FetchActiveGitRepoResponnse = {
   items: [
     {
       html_url: string;
-    },
+    }
   ];
 };
 
 const fetchActiveGitRepos: RequestHandler<FetchActiveGitRepoParams> = async (
-  req,
+  req
 ) => {
   const { star_threshold } = req.params;
   const stars_scalar = +(star_threshold ?? 5000);
@@ -41,9 +41,7 @@ const fetchActiveGitRepos: RequestHandler<FetchActiveGitRepoParams> = async (
 // Route ordering matters, the first route that matches will be used
 // Any route that does not return will be treated as a middleware
 // Any unmatched route will return a 404
-router
-  .get("/fetch-active-git-repos", fetchActiveGitRepos)
-  .get("/hello/:name", ({ name }) => `Hello, ${name}!`);
+router.get("/fetch-active-git-repos", fetchActiveGitRepos);
 
 //@ts-ignore
 addEventListener("fetch", async (event: FetchEvent) => {

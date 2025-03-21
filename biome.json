@@ -8,7 +8,7 @@
   "files": {
     "ignoreUnknown": false,
     "ignore": [],
-    "include": ["./js-monorepo/**"]
+    "include": ["./projects/**"]
   },
   "formatter": {
     "enabled": true,

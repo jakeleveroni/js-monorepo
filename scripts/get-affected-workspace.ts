@@ -1,5 +1,5 @@
-import getRootDir from "../../infra/get-root-dir";
-import { getPackageJson } from "../../infra/get-package-json";
+import getRootDir from "../infra/get-root-dir";
+import { getPackageJson } from "../infra/get-package-json";
 
 const rootDir = getRootDir();
 const packageJson = getPackageJson();

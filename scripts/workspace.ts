@@ -1,6 +1,6 @@
 import { file } from "bun";
 import { parseArgs } from "util";
-import { getPackageJson } from "../../infra/get-package-json";
+import { getPackageJson } from "../infra/get-package-json";
 
 const packageJson = getPackageJson();
 
