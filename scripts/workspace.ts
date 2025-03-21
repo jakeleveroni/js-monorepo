@@ -53,6 +53,12 @@ async function run() {
     `);
     process.exit(0);
   }
+
+  if (!values.script) {
+    console.error("No script detected");
+    return;
+  }
+
   const ptIndex = tokens.findIndex((x) => x.kind === "option-terminator");
   const passthroughs = ptIndex
     ? tokens
@@ -94,8 +100,21 @@ async function runWorkspaceScript(cwd: string, passthrough: string[]) {
       return;
     }
 
+    let isPkgJsonScript = true;
+    try {
+      await file(`${cwd}/scripts/${values.script}.ts`).stat();
+      isPkgJsonScript = false;
+    } catch {
+      console.log("No script file found, running as package.json script");
+    }
+
     Bun.spawn({
-      cmd: ["bun", "run", `scripts/${values.script}.ts`, ...passthrough],
+      cmd: [
+        "bun",
+        "run",
+        isPkgJsonScript ? values.script! : `scripts/${values.script!}.ts`,
+        ...passthrough,
+      ],
       cwd,
       stdio: ["inherit", "inherit", "inherit"],
       onExit(info) {

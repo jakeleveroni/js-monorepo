@@ -6,7 +6,7 @@
     "projects/*"
   ],
   "scripts": {
-    "ws": "bun ./scripts/bun/workspace.ts"
+    "ws": "bun ./scripts/workspace.ts"
   },
   "dependencies": {},
   "devDependencies": {
