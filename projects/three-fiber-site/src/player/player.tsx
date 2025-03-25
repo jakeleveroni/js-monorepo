@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
-import { Vector3, type Mesh } from 'three';
-import { useKeyboardControls } from '@react-three/drei';
+import { type RefObject, useEffect, useRef } from 'react';
+import { Vector3, type PerspectiveCamera as ThreePerspectiveCamera, type Mesh } from 'three';
+import { useKeyboardControls, PerspectiveCamera } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { RigidBody } from '@react-three/rapier';
+import { CapsuleCollider, RigidBody } from '@react-three/rapier';
 import type { RapierRigidBody } from '@react-three/rapier';
 import type { Controls } from '../controls/player-controls';
 
@@ -14,22 +14,36 @@ export function Player(props: Props) {
   const { speed } = props;
   const meshRef = useRef<Mesh>(null);
   const rigidBodyRef = useRef<RapierRigidBody>(null);
+  const cameraRef = useRef<ThreePerspectiveCamera>(null);
   const [sub, get] = useKeyboardControls<Controls>();
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: only subscribe to controls on mount
   useEffect(() => {
     return sub(
-      (state) => state.forward,
-      (pressed) => {
-        console.log('forward', pressed);
-      },
+      (state) => state,
+      (state) => console.log(state),
     );
   }, []);
+
+  useCameraFollow(cameraRef, rigidBodyRef);
 
   useFrame((_, delta) => {
     if (!rigidBodyRef.current) return;
 
     const pressed = get();
+    if (!pressed.forward && !pressed.back && !pressed.left && !pressed.right) {
+      const velocity = rigidBodyRef.current.linvel();
+
+      // Decelerate smoothly by interpolating the velocity
+      const newVelocity = {
+        x: Math.abs(velocity.x) > 0.01 ? velocity.x - velocity.x * 0.05 : 0,
+        y: velocity.y, // keep y velocity intact unless you want gravity to affect it
+        z: Math.abs(velocity.z) > 0.01 ? velocity.z - velocity.z * 0.05 : 0,
+      };
+
+      rigidBodyRef.current.setLinvel(newVelocity, false);
+    }
+
     const direction = new Vector3();
 
     if (pressed.forward) {
@@ -50,15 +64,59 @@ export function Player(props: Props) {
       direction.normalize().multiplyScalar(speed);
     }
 
-    rigidBodyRef.current.setLinvel({ x: direction.x, y: 0, z: direction.z }, true);
+    rigidBodyRef.current.applyImpulse({ x: direction.x, y: 0, z: direction.z }, true);
   });
 
-  return (
-    <RigidBody ref={rigidBodyRef} type="kinematicVelocity">
-      <mesh ref={meshRef} position={[0, 2, 2]}>
-        {/* Radius, length, cap segments, radial segments */}
-        <capsuleGeometry args={[0.5, 1, 10, 20]} /> <meshStandardMaterial color="blue" />
-      </mesh>
-    </RigidBody>
-  );
+  return rigidBodyRef ? (
+    <>
+      <PerspectiveCamera
+        ref={cameraRef}
+        makeDefault
+        position={[0, 8, 20]}
+        rotation={[-0.15, 0, 0]}
+      />
+
+      <RigidBody
+        ref={rigidBodyRef}
+        mass={0}
+        gravityScale={1.2}
+        friction={0}
+        type="dynamic"
+        lockRotations
+        position={[0, 2, 0]}
+        linearDamping={0.9}
+        angularDamping={0.9}
+      >
+        <CapsuleCollider args={[0.5, 0.55]} />
+        <mesh ref={meshRef}>
+          {/* Radius, length, cap segments, radial segments */}
+          <capsuleGeometry args={[0.5, 1, 10, 20]} />
+          <meshStandardMaterial color="blue" />
+        </mesh>
+      </RigidBody>
+    </>
+  ) : null;
+}
+
+function useCameraFollow(
+  cameraRef: RefObject<ThreePerspectiveCamera | null>,
+  targetRef: RefObject<RapierRigidBody | null>,
+) {
+  const cameraOffset = new Vector3(0, 6, 12);
+
+  useFrame(() => {
+    if (!targetRef?.current || !cameraRef?.current) return;
+
+    // Get the player's position
+    const { x, y, z } = targetRef.current.translation();
+
+    // Compute the new camera position based on the player's position
+    const targetPosition = new Vector3(x, y, z).add(cameraOffset);
+
+    // Smoothly interpolate the camera position
+    cameraRef.current.position.lerp(targetPosition, 0.1);
+
+    // Make the camera look at the player
+    cameraRef.current.lookAt(x, y, z);
+  });
 }
