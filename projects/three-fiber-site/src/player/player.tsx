@@ -1,6 +1,12 @@
 import { type RefObject, useEffect, useRef } from 'react';
-import { Vector3, type PerspectiveCamera as ThreePerspectiveCamera, type Mesh } from 'three';
-import { useKeyboardControls, PerspectiveCamera } from '@react-three/drei';
+import {
+  Vector3,
+  type PerspectiveCamera as ThreePerspectiveCamera,
+  type Mesh,
+  Quaternion,
+  AxesHelper,
+} from 'three';
+import { useKeyboardControls, PerspectiveCamera, Helper } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { CapsuleCollider, RigidBody } from '@react-three/rapier';
 import type { RapierRigidBody } from '@react-three/rapier';
@@ -65,7 +71,10 @@ export function Player(props: Props) {
       direction.normalize().multiplyScalar(speed);
     }
 
+    const targetRotation = new Quaternion().setFromUnitVectors(new Vector3(0, 0, 1), direction);
+
     rigidBodyRef.current.applyImpulse({ x: direction.x, y: 0, z: direction.z }, true);
+    rigidBodyRef.current.setRotation(targetRotation, true);
   });
 
   return rigidBodyRef ? (
@@ -83,7 +92,6 @@ export function Player(props: Props) {
         gravityScale={1.2}
         friction={0}
         type="dynamic"
-        lockRotations
         position={[0, 2, 0]}
         linearDamping={0.9}
         angularDamping={0.9}

@@ -20,10 +20,10 @@ function Root() {
       <PlayerControls>
         <Canvas camera={{ position: [0, 0, 10] }}>
           <Physics debug>
-            <ambientLight intensity={Math.PI / 2} />
-            <pointLight position={[-20, 15, -10]} decay={0} intensity={Math.PI} />
-            <Player speed={1.5} />
-            <FloorBox position={[0, 0, 0]} rotation={[0, 0, 0]} scale={[4, 1, 4]} />
+            <ambientLight intensity={Math.PI / 4} />
+            <pointLight position={[20, 15, 10]} decay={0} intensity={Math.PI} />
+            <Player speed={1} />
+            <FloorBox position={[0, 0, 0]} scale={[4, 1, 4]} />
             <Stats />
           </Physics>
           <DebugOrbitControls />
