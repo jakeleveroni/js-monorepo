@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import { CapsuleCollider, RigidBody } from '@react-three/rapier';
 import type { RapierRigidBody } from '@react-three/rapier';
 import type { Controls } from '../controls/player-controls';
+import { useDebugContext } from '../debug/debug-provider';
 
 type Props = {
   speed: number;
@@ -36,9 +37,9 @@ export function Player(props: Props) {
 
       // Decelerate smoothly by interpolating the velocity
       const newVelocity = {
-        x: Math.abs(velocity.x) > 0.01 ? velocity.x - velocity.x * 0.05 : 0,
+        x: Math.abs(velocity.x) > 0.01 ? velocity.x - velocity.x * 0.01 : 0,
         y: velocity.y, // keep y velocity intact unless you want gravity to affect it
-        z: Math.abs(velocity.z) > 0.01 ? velocity.z - velocity.z * 0.05 : 0,
+        z: Math.abs(velocity.z) > 0.01 ? velocity.z - velocity.z * 0.01 : 0,
       };
 
       rigidBodyRef.current.setLinvel(newVelocity, false);
@@ -102,10 +103,11 @@ function useCameraFollow(
   cameraRef: RefObject<ThreePerspectiveCamera | null>,
   targetRef: RefObject<RapierRigidBody | null>,
 ) {
+  const { orbitEnabled } = useDebugContext();
   const cameraOffset = new Vector3(0, 6, 12);
 
   useFrame(() => {
-    if (!targetRef?.current || !cameraRef?.current) return;
+    if (!targetRef?.current || !cameraRef?.current || orbitEnabled) return;
 
     // Get the player's position
     const { x, y, z } = targetRef.current.translation();
