@@ -1,0 +1,19 @@
+spin_manifest_version = 2
+
+[application]
+authors = ["jakeleveroni <jacobjleveroni@gmail.com>"]
+description = "serverless wasm backend"
+name = "levdev-serverless"
+version = "0.1.0"
+
+[[trigger.http]]
+route = "/..."
+component = "levdev-serverless"
+
+[component.levdev-serverless]
+source = "dist/levdev-serverless.wasm"
+exclude_files = ["**/node_modules"]
+allowed_outbound_hosts = ["https://api.github.com"]
+[component.levdev-serverless.build]
+command = ["npm install", "npm run build"]
+watch = ["src/**/*.ts"]
