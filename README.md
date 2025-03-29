@@ -1,6 +1,6 @@
-# JS Projects
+# JS Monrepo
 
-This project is a playground for me ultimately. I am going to be playing with building out custom monorepo tooling in the Bun ecosystem. I think Bun has huge potential as a great monorepo tool as it integrates so many disparate parts of the node ecosystem. Namely native TS support, the build in test runner, and the ESM first design. I think Bun has the potentially to eventually overtake node strictly due to its developer friendliness. 
+This monorepo is a playground for my JS/TS based projects. I am going to be using it to build out custom monorepo tooling via Bun. I think Bun has huge potential as a great monorepo tool as it integrates so many disparate parts of the node ecosystem. Namely: native TS support, a built-in test runner, and the TS + ESM first design. I think Bun has the potential to eventually overtake node strictly due to its developer friendliness. 
 
 ## Current projects in monorepo
 
