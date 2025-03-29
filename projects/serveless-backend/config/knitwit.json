@@ -1,5 +1,10 @@
 {
   "version": 1,
+  "project": {
+    "worlds": [
+      "spin-http"
+    ]
+  },
   "packages": {
     "@fermyon/spin-sdk": {
       "witPath": "../../bin/wit",
