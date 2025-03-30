@@ -8,7 +8,7 @@
   "files": {
     "ignoreUnknown": false,
     "ignore": [],
-    "include": ["./projects/**"]
+    "include": ["./projects/**", "./node-projects/**"]
   },
   "formatter": {
     "enabled": true,

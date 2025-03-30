@@ -3,8 +3,7 @@
   "version": "0.0.1",
   "name": "codemosis",
   "workspaces": [
-    "projects/*",
-    "!projects/serverless-backend"
+    "projects/*"
   ],
   "scripts": {
     "ws": "bun ./scripts/workspace.ts"
