@@ -7,7 +7,7 @@ function memoizedRootDir() {
     }
 
     // TODO pull this from package.json root
-    const target = "codemosis";
+    const target = "js-monorepo";
 
     const dirParts = __dirname.split("/").filter(Boolean);
 

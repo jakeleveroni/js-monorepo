@@ -1,0 +1,26 @@
+{
+  "name": "@ldlabs/utils",
+  "private": false,
+  "version": "0.0.0",
+  "type": "module",
+  "aliases": [
+    "utils"
+  ],
+  "main": "src/index.ts",
+  "exports": {
+    "default": "./src/index.ts",
+    "types": "./src/index.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      "types": "./dist/src/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "~5.7.2",
+    "vite": "^6.2.0"
+  }
+}

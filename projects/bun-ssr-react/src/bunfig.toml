@@ -1,0 +1,23 @@
+[dev]
+# Enable watch mode
+watch = true
+
+# Hot reloading
+hot = true
+
+# Files to watch for changes
+watchFiles = ["src/**/*.{ts,tsx,js,jsx}"]
+
+[build]
+# Entry point for the server
+entrypoints = ["src/server/index.tsx"] 
+
+# Output directory for server build
+outdir = "dist/server"
+
+# Minify the output
+minify = true
+
+# TypeScript settings
+jsx = "react"
+tsconfig = "tsconfig.json"

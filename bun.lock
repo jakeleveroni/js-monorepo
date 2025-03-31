@@ -7,6 +7,14 @@
         "@biomejs/biome": "^1.9.4",
       },
     },
+    "modules/utils": {
+      "name": "@ldlabs/utils",
+      "version": "0.0.0",
+      "devDependencies": {
+        "typescript": "~5.7.2",
+        "vite": "^6.2.0",
+      },
+    },
     "projects/a-modern-proposal": {
       "name": "a-modern-proposal",
       "version": "0.0.1",
@@ -41,6 +49,25 @@
       },
       "peerDependencies": {
         "typescript": "^5.0.0",
+      },
+    },
+    "projects/bun-ssr-react": {
+      "name": "bun-ssr-react",
+      "version": "0.0.0",
+      "dependencies": {
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
+      },
+      "devDependencies": {
+        "@eslint/js": "^9.21.0",
+        "@ldlabs/utils": "workspace:^",
+        "@types/react": "^19.0.10",
+        "@types/react-dom": "^19.0.4",
+        "@vitejs/plugin-react": "^4.3.4",
+        "globals": "^15.15.0",
+        "typescript": "~5.7.2",
+        "typescript-eslint": "^8.24.1",
+        "vite": "^6.2.0",
       },
     },
     "projects/three-fiber-site": {
@@ -271,6 +298,8 @@
     "@jridgewell/sourcemap-codec": ["@jridgewell/sourcemap-codec@1.5.0", "", {}, "sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ=="],
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.25", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ=="],
+
+    "@ldlabs/utils": ["@ldlabs/utils@workspace:modules/utils"],
 
     "@mediapipe/tasks-vision": ["@mediapipe/tasks-vision@0.10.17", "", {}, "sha512-CZWV/q6TTe8ta61cZXjfnnHsfWIdFhms03M9T7Cnd5y2mdpylJM0rF1qRq+wsQVRMLz1OYPVEBU9ph2Bx8cxrg=="],
 
@@ -553,6 +582,8 @@
     "buffer-equal-constant-time": ["buffer-equal-constant-time@1.0.1", "", {}, "sha512-zRpUiDwd/xk6ADqPMATG8vc9VPrkck7T07OIx0gnjmJAnHnTVXNQG3vfvWNuiZIkwu9KrKdA1iJKfsfTVxE6NA=="],
 
     "buffer-from": ["buffer-from@1.1.2", "", {}, "sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ=="],
+
+    "bun-ssr-react": ["bun-ssr-react@workspace:projects/bun-ssr-react"],
 
     "bun-types": ["bun-types@1.2.5", "", { "dependencies": { "@types/node": "*", "@types/ws": "~8.5.10" } }, "sha512-3oO6LVGGRRKI4kHINx5PIdIgnLRb7l/SprhzqXapmoYkFl5m4j6EvALvbDVuuBFaamB46Ap6HCUxIXNLCGy+tg=="],
 

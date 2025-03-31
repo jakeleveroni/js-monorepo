@@ -1,9 +1,10 @@
 {
   "private": true,
   "version": "0.0.1",
-  "name": "codemosis",
+  "name": "js-monorepo",
   "workspaces": [
-    "projects/*"
+    "projects/*",
+    "modules/*"
   ],
   "scripts": {
     "ws": "bun ./scripts/workspace.ts"

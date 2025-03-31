@@ -60,13 +60,14 @@ async function run() {
   }
 
   const ptIndex = tokens.findIndex((x) => x.kind === "option-terminator");
-  const passthroughs = ptIndex
-    ? tokens
-        .slice(ptIndex ?? tokens.length)
-        .filter((x) => x.kind === "option" || x.kind === "positional")
-        .map((x) => x.value)
-        .filter((x) => x !== undefined)
-    : [];
+  const passthroughs =
+    ptIndex > -1
+      ? tokens
+          .slice(ptIndex ?? tokens.length)
+          .filter((x) => x.kind === "option" || x.kind === "positional")
+          .map((x) => x.value)
+          .filter((x) => x !== undefined)
+      : [];
 
   if (!values.workspace) {
     console.error(
@@ -107,7 +108,7 @@ async function runWorkspaceScript(cwd: string, passthrough: string[]) {
     } catch {
       console.log("No script file found, running as package.json script");
     }
-
+    console.log("passtr", passthrough);
     Bun.spawn({
       cmd: [
         "bun",
