@@ -7,7 +7,8 @@
     "modules/*"
   ],
   "scripts": {
-    "ws": "bun ./scripts/workspace.ts"
+    "ws": "bun ./scripts/workspace.ts",
+    "affected": "bun ./scripts/get-affected-workspaces.ts"
   },
   "dependencies": {},
   "devDependencies": {

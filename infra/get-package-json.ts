@@ -19,7 +19,7 @@ export type PackageJSON = {
 /**
  * HOC method that reads in package.json & caches it, on subsequent calls the cached version is returne
  */
-export function getPackageJson() {
+function getPackageJson() {
   let cache: Record<string, PackageJSON> = {};
 
   /**
@@ -64,3 +64,5 @@ export function getPackageJson() {
     return modifiedPkgJson;
   };
 }
+
+export default getPackageJson();

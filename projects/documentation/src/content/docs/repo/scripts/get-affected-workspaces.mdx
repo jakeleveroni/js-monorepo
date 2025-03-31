@@ -1,0 +1,41 @@
+---
+title: get-affected-workspaces
+description: Documentation on the the get-affected-workspaces.ts script
+template: doc
+---
+
+# Command Description
+
+This command checks all the workspaces as defined by the root `package.json`'s `workspaces` array. It uses Bun Glob pattern matching to determine which directories are workspaces and then runs a `git diff` on each of them to derive an array of affected workspaces.
+
+This will be used much more later on when we start building out automation functionality for generating tasks to execute in CI.
+
+This command is aliased in the root `package.json` as `affected`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Input Name</th>
+      <th>Shorthand</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colSpan={4} style="text-align:center;">N/A</td>
+    </tr>
+  </tbody>
+</table>
+
+## Example Usage
+
+Running the command to get a list of affected workspaces.
+```sh
+bun affected
+```
+
+Manually call the script
+```sh
+bun run scripts/get-affected-workspaces.ts
+```

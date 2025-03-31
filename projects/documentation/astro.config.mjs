@@ -10,6 +10,7 @@ export default defineConfig({
       social: {
         github: "https://github.com/jakeleveroni/js-monorepo",
       },
+      customCss: ["./styles.css"],
       sidebar: [
         {
           label: "Repo",

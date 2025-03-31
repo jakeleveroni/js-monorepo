@@ -1,9 +1,127 @@
 ---
-title: Overview
+title: Monorepo Overview
 description: Documentation on the monorepo's tooling
 template: doc
-hero:
-  tagline: Mainly Bun based tooling, some reluctant node here and there as well.
-  image:
-    file: ../../../assets/houston.webp
 ---
+
+This is a Javscript based monorepo that holds a bunch of my projects. I will likely not finish many of these projects but its primarily a playground for me to tinker and learn in. Its a my Javascript Tool bench if you will.
+
+This monorepo is built using Bun and as i have worked in it i have built out more cli tooling for working in a monorepo via bun. I hope to expand on this as i use it more and the needs arise to hopefully build a robust monorepo developer environment based on what i think is the next evolution of javascript runtimes.
+
+## Working in the Monorepo
+
+When working in the monorepo its important to understand some of the tooling that is currently built out for your convenience.
+
+## Project Structure
+
+This repo is broken down into a handful of top level folders:
+
+```
+js-monorepo/
+├── projects/
+├── node-projects/
+├── modules/
+├── infra/
+└── scripts/
+```
+
+### projects
+
+This is where the Bun based applications are defined. This and the modules are the primary focuses of the monorepo tooling. Each applciation will have a directory here
+
+### node-project
+
+This is where any Node.js based applications are defined. I try to avoid this as I want to focus on Bun, but until it has 100$ node compat some things just dont work and WASM is one of them.
+
+### modules
+
+This is where the modules that are shared across applciations are defined. If you want to define libraries this is where you would do it.
+
+### infra
+
+This is where I define utility methods that monorepo scripts might rely on.
+
+### scripts
+
+This is where i define cli commands I run via Bun. Sometimes I wire them up to package.json scripts other times i run them directly via `bun run {script-name}`. And other times still I call them via other scripts with `Bun.spawn`. 
+
+See the `scripts` option in the side navigation for a more in-depth look at the individual scripts exposed thus far.
+
+**NOTE: app & modules in the `/projects` and `/modules` directories can define their own scripts by placing the scripts in their respective app's `{app-name}/scripts` folder. i.e. `/my-app/scripts/custom-start.ts`.**
+
+## Standards
+
+### Javascript Engines 
+
+<div>
+  <a href="https://bun.sh/" target="_blank">Bun</a>
+</div>
+<div>
+  <a href="https://nodejs.org/en" target="_blank">Node</a>
+</div>
+
+
+### Language & Framework Technologies
+<table>
+  <thead>
+    <tr>
+      <th>Frontend</th>
+      <th>Backend / Runtime</th>
+      <th>Other</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <a href="https://react.dev/" target="_blank">React</a>
+      </td>
+      <td>
+        <a href="https://react.dev/" target="_blank">Express</a>
+      </td>
+      <td>
+        <a href="https://webassembly.org/" target="_blank">WASM</a>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <a href="https://threejs.org/manual/#en/creating-a-scene" target="_blank">three.js</a> / <a href="https://r3f.docs.pmnd.rs/getting-started/introduction" target="_blank">react-three-fiber</a>
+      </td>
+      <td>
+        <a href="https://www.fermyon.com/spin" target="_blank">Fermyon Spin</a>
+      </td>
+      <td>
+        <a href="https://www.docker.com/" target="_blank">Docker</a>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <a href="https://docs.astro.build/en/getting-started/" target="_blank">Astro</a>
+      </td>
+      <td></td>
+      <td>
+        <a href="https://www.postgresql.org/" target="_blank">Postgres</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+### Formatting & Linting
+
+<div>
+  <a href="https://biomejs.dev/" target="_blank">Biome</a>
+</div> 
+
+### Testing
+
+<div>
+  <a href="https://bun.sh/docs/cli/test" target="_blank">Bun Test Runner</a>
+</div> 
+<div>
+  <a href="https://www.npmjs.com/package/supertest" target="_blank">Super Test</a>
+</div> 
+
+
+### Package Manager 
+<div>
+  <a href="https://bun.sh/package-manager" target="_blank">Bun Package Manager</a>
+</div>

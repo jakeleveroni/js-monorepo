@@ -2,8 +2,56 @@
 title: Bun SSR React
 description: A react SSR project built with Bun's std http server.
 template: doc
-hero:
-  tagline: A playground for learning SSR concepts via Bun's std http server and react dom.
-  image:
-    file: ../../../assets/houston.webp
 ---
+
+An experiment in server side rendering. Specifically focused on breaking it down into a micro component frontend architecture.
+
+## Development
+
+Install dependencies
+
+```sh
+bun install
+```
+
+Start client
+
+```sh
+bun ws -w ssr -s dev:client
+```
+
+Start server
+
+```sh
+bun ws -w ssr -s dev:server
+```
+
+Open your browser to `http://localhost5177`
+
+## Implementation
+
+I created a bun server via `Bun.serve` on port `5177`. The bun server is setup to handle the following scenarios:
+
+### Static Asset and Main Entrypoint Calls
+
+Routes: `/assets/`, `*.ico,svg,jpeg,jpg`, `/main.js`
+
+Any request that matches the above routes is handled by fetching the associated file from the `dist/` folder.
+
+### Client App Routes
+
+Routes: `/app/*`
+
+Routes that are under the `/app` prefix are considered client app routes. In built environments they are setup to server your built assets from the `/dist` directory. **When running locally it instead proxies requests to the vite process on 3000 that runs the client app.**
+
+### API Routes
+
+Routes: `/api/*`
+
+A simple http rest api route, its used for client side requests after initial server side render.
+
+## Future Plans
+
+My plan here is to try and create a micro-component frontend architecture where you can write react components on the backend that can be requested by the frontend and streamed into the UI at the component level. Not really sure if this is a dumb idea or not but it seemed like a really interesting challenge.
+
+**tl;dr - micro component frontend architecture POC (I know, I hate the sound of it too but itll be a fun learning process)**

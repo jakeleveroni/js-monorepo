@@ -1,8 +1,6 @@
 import { file } from "bun";
 import { parseArgs } from "util";
-import { getPackageJson } from "../infra/get-package-json";
-
-const packageJson = getPackageJson();
+import getPackageJson from "../infra/get-package-json";
 
 const { values, tokens } = parseArgs({
   args: Bun.argv,
@@ -31,7 +29,7 @@ const { values, tokens } = parseArgs({
 await run();
 
 async function run() {
-  const rootPkgJson = await packageJson();
+  const rootPkgJson = await getPackageJson();
   if (values.help) {
     console.log(`
       A cli command that enables running project level scripts from the root of the repository

@@ -1,9 +1,8 @@
 import getRootDir from "../infra/get-root-dir";
-import { getPackageJson } from "../infra/get-package-json";
+import getPackageJson from "../infra/get-package-json";
 
 const rootDir = getRootDir();
-const packageJson = getPackageJson();
-const rootPkgJson = await packageJson();
+const rootPkgJson = await getPackageJson();
 
 const workspaces = rootPkgJson.indexedWorkspaces ?? [];
 const affected: Array<{

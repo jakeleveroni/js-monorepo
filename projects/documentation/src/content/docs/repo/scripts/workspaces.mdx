@@ -1,0 +1,54 @@
+---
+title: workspaces
+description: Documentation on the the workspaces script
+template: doc
+---
+
+# Command Description
+
+This command enables rudimentary functionality similar to `yarn -workspaces ...`. It is used to execute scripts on specified "workspaces" (folders under the `/projects` & `/modules` directories).
+
+In the root package.json there is a script declared called `ws` (workspaces for short). This aliases `bun run scripts/workspaces.ts` to `bun ws`. This script accepts a few parameters `workspace`, `script`, an `help`.
+
+This cli command respects passthrough parameters delimeted by `--` (double hyphen). Anything following the space after `--` will be passed to the underlying script called.
+
+<table>
+  <thead>
+    <tr>
+      <th>Input Name</th>
+      <th>Shorthand</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>workspace</td>
+      <td>w</td>
+      <td>string</td>
+      <td>Name of a workspace under the package.json's defined workspaces. Can be a workspace specific package.json script or a script in the workspace's scripts/ directory.</td>
+    </tr>
+  </tbody>
+</table>
+
+## Example Usage
+
+Running a single workspace
+```sh
+bun ws --workspace foo --script build
+```
+
+Running a command against multiple workspaces
+```sh
+bun ws -w foo -w bar -s build
+```
+
+Running a command with passthrough parameters. Here the `--mode` param is propagated to the `build` command defined in the specified workspaces. This script will check the workspaces's scripts directory first. Then the workspaces `package.json` scripts. If nothing is found that matches the script name it will fail.
+```sh
+bun ws -w foo -w bar -s build -- --mode production
+```
+
+Manually call the script
+```sh
+bun run scripts/workspaces.ts -w foo -w bar -s build
+```
