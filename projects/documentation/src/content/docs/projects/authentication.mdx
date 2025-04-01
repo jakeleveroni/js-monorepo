@@ -2,10 +2,77 @@
 title: Authentication
 description: simple jwt express authentication server
 template: doc
-hero:
-  tagline: A pet project to learn more about how jwt authentication works
-  image:
-    file: ../../../assets/houston.webp
 ---
 
-# A simple auth server
+## An Express Based JWT Server
+
+This project started as I was interested in how JWT authentication worked from a backend sense. I had worked on various parts of the authentication flow before but never the actual server that manages generating, assigning, and validating JWTs. It was the perfect opportunity to learn.
+
+## Development
+
+Install any dependencies:
+
+```sh
+bun install
+```
+
+Start the application
+
+```sh
+bun ws -w auth -s dev
+```
+
+The server should now be running on `http://localhost:3010`
+
+## Testing
+
+The test suite is setup so that on startup, the database connection the server expects is replaced with an in memory database via [pg-mem](https://github.com/oguimbal/pg-mem). This allows us to test end-to-end from request to database. It also ensures the latest DB schema is applied to the in memory database so you can be confident in your tests. 
+
+API tests are validated with [supertest](https://www.npmjs.com/package/supertest). To run the test suite simple run:
+
+```sh
+bun ws -auth -s test
+```
+
+## Workspace Commands
+
+Workspace specific commands
+
+### gen-error-code
+
+This command generates error codes. It takes in an optional prefix and returns a list of error codes based on that prefix. Essentially just `prefix-incrementing_number`. It can be handy for backfilling API error responses to provide unique ID's to each possible error the api can return.
+
+**Example Usage**
+
+```sh
+bun ws -w auth -s gen-error-code -- -p EXPREFIX -a 2
+
+# Outputs: EXPREFIX-0001, EXPREFIX-0002
+```
+
+The idea behind this was to provide a unique ID for every error response the authentication server sends to make it easy to pinpoint where an error you see in a response from this server originated from.
+
+
+### gen-secret
+
+This is a simple command that takes an input and returns a hex encoded sha512 has of the provided input. This is used to generate secrets that we can use to hash the users passwords with. Keep in mind in a deployed env you NEED TO KEEP THE SECRETS SAFE i.e. NOT COMMITTED.
+
+**Example Usage**
+
+```sh
+bun ws -w auth -s gen-secret -- -i "a super secret input phrase"
+
+# Outputs: 
+#Secret generated:
+#
+#  6a91110047a55ebd9045f945de32e5511ec15c0cf27b9ac6c22ab19cf8dee5c677e05deabe72dfa7e45e9d2fe1c39356b012c66235ed1fbe6b05b6580314fdea
+#
+# dont lose your input value or you wont be able to re-generate it.
+```
+
+## Next Steps
+
+- I want to standup a valkey cache layer for this server to use
+  - once that is stood up i want to move the JTI introspection into valkey instead of a rudimentary in-memory object.
+- Audit for other common security vulnerabilities in JWT servers and remedy
+- Build out a much more thorough test suite

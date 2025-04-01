@@ -6,9 +6,11 @@ const { values } = parseArgs({
   options: {
     input: {
       type: 'string',
+      short: 'i',
     },
     help: {
       type: 'boolean',
+      short: 'h',
     },
   },
   strict: true,

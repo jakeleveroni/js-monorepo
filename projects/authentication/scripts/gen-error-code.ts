@@ -5,13 +5,16 @@ const { values } = parseArgs({
   options: {
     prefix: {
       type: 'string',
+      short: 'p',
     },
     amt: {
       type: 'string',
       default: '5',
+      short: 'a',
     },
     help: {
       type: 'boolean',
+      short: 'h',
       default: false,
     },
   },

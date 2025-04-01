@@ -106,7 +106,7 @@ async function runWorkspaceScript(cwd: string, passthrough: string[]) {
     } catch {
       console.log("No script file found, running as package.json script");
     }
-    console.log("passtr", passthrough);
+
     Bun.spawn({
       cmd: [
         "bun",
