@@ -4,6 +4,8 @@ import starlight from "@astrojs/starlight";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://jakeleveroni.github.io",
+  base: "js-monorepo",
   integrations: [
     starlight({
       title: "Levdev Labs",
