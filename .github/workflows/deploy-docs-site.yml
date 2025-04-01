@@ -18,7 +18,7 @@ jobs:
         uses: withastro/action@v3
         with:
             path: ./projects/documentation
-            package-manager: Bun
+            package-manager: bun
 
   deploy:
     needs: build
