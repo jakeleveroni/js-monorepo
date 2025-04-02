@@ -4,4 +4,63 @@ description: A serverless backend setup built with Fermyon Spin
 template: doc
 ---
 
-# WASM Serverless Backend
+This project is a serverless wasm backend experiment built with Fermyon Spin. I just came across <a href="https://developer.fermyon.com/spin/v3/" target="_blank">Fermyon Spin</a> via an LLM suggestion for self hosted serveless backend tools.
+
+Fermyon Spin enables you to write serverless backends in any WASM compatible language you want. Im did an initial test with Typescript but im looking forward to learning some Assembly script as think ultimately it will feel more natural when compiling to WASM. 
+
+## Development
+
+### Requirements: 
+
+<a href="https://nodejs.org/en/download">Node</a> (version 22 or later)
+
+<a href="https://developer.fermyon.com/spin/v3/install" target="_blank">Spin CLI</a>
+
+
+### Setup & Build
+
+I couldnt get the Spin SDK to work with Bun so this project uses node for now. 
+
+Install dependencies
+
+```sh
+npm install
+```
+
+### Start Backend
+
+Build the project. This will produce the WASM & WASI output for the serverless backend process. There should be a /build and /dist folder now. The combiled WASM method is referenced in the spin.toml to register the server base route.
+
+```sh
+spin build
+```
+
+Start the backend 
+
+```sh
+spin up
+```
+
+The application should be live on `http://localhost:3000`
+
+## Endpoints
+
+### get-trending-repos
+
+Route: `/api/get-trending-repos`
+Parameters: 
+ - `star_threshold: number | undefined` - The number of stars the repo needs to be included in the results.
+ - `sort: string | undefined` - The attribute to sort the results by, valid options are: `"stars", "forks", "help-wanted-issues", "updated"`.
+ - `per_page: number | undefined` - The number of results to include in the result set.
+
+ This endpoint queries github repos based on the above information. Initially it was created cause I was interested in querying github every so often to learn about hot new repos in the community.
+
+ ## Future Plans
+
+ One of the cool things about WASM is it runs in a sandboxed environment that is secure by default (as secure as you can get but nothing is 100%). Running with the assumption that the process context is more than likely secure it enables some interesting possibilities that we previously had written off. Things like running user generated code directly. I know that sounds scary but its also quite interesting too.
+
+
+ My next ideas for this project include:
+  - Continue adding fun endpoints for my own amusement.
+  - Look into assemblyscipt and make some endpoints with it.
+  - Explore exposing a UI for users to write their own endpoints in that can be uploaded and registered/unregistered from the server at runtime. Creating a completely modular api that could have endpoints hot swapped at runtime.
