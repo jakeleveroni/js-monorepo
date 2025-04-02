@@ -1,13 +1,27 @@
 # Bun SSR React Playground
 
-An experiment running a bun SSR react server. Mainly an opportunity to get a better understanding of ssr concepts and how it works with react and jsx specifically.
+[Documentation](https://jakeleveroni.github.io/js-monorepo/projects/bun-ssr-react/)
 
-Starting the project locally
+An experiment in server side rendering. Specifically focused on breaking it down into a micro component frontend architecture.
+
+## Development
+
+Install dependencies
 
 ```sh
-bun run dev:server
+bun install
 ```
 
-Then you can access the application on http://localhost:5177 (currently there is only a `/weather-info route`)
+Start client
 
-I dont have hot reload working entirely yet, if you want partial hot reloading you can run `bun run dev:client` as well which will rebuild the client code when you make changes to client code. It should appear in the browser after a reload at that point.
+```sh
+bun ws -w ssr -s dev:client
+```
+
+Start server
+
+```sh
+bun ws -w ssr -s dev:server
+```
+
+Open your browser to `http://localhost5177`
