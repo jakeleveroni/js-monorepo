@@ -4,5 +4,8 @@
   "editor.codeActionsOnSave": {
     "quickfix.biome": "explicit"
   },
-  "explorer.compactFolders": false
+  "explorer.compactFolders": false,
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

@@ -1,0 +1,36 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Check Bun Version
+        run: bun --version
+
+      - name: Install dependencies
+        run: bun install --production --frozen-lockfile
+
+        # TODO: figure out how to get affected here so i can only run tasks on the affected workspaces. for now we run over all of them.
+
+      - name: Calculate tasks
+        id: matrix-data
+        run: |
+          echo "RESULT=$(bun tasks -a -t pullrequest)" >> $GITHUB_OUTPUT
+
+      - name: Use output
+        run: echo "The output was ${{ steps.matrix-data.outputs.RESULT }}"

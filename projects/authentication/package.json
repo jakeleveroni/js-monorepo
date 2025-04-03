@@ -1,12 +1,8 @@
 {
   "name": "authentication",
-  "aliases": [
-    "auth"
-  ],
+  "aliases": ["auth"],
   "module": "server.ts",
-  "alias": [
-    "auth"
-  ],
+  "alias": ["auth"],
   "type": "module",
   "devDependencies": {
     "@types/bun": "^1.2.2",
@@ -25,6 +21,7 @@
   },
   "scripts": {
     "dev": "bun run server.ts",
+    "build": "bun run ./bundle.ts",
     "test": "bun test --preload ./test/api/utils/mock-db-pool.ts"
   },
   "dependencies": {
