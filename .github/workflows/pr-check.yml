@@ -30,11 +30,29 @@ jobs:
       - name: Calculate tasks
         id: matrix-data
         run: |
-          echo "$(pwd)";
-          echo "$(ls)";
-          pushd /home/runner/work/js-monorepo/js-monorepo
-          # echo "RESULT=$(bun tasks -a -t pullrequest)" >> $GITHUB_OUTPUT
-          bun tasks -a -t pullrequest
+          echo "RESULT=$(bun tasks -a -t pullrequest)" >> $GITHUB_OUTPUT
 
       - name: Use output
         run: echo "The output was ${{ steps.matrix-data.outputs.RESULT }}"
+
+  run-tasks:
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        commands: ${{ fromJSON(needs.setup.outputs.RESULT) }}
+      fail-fast: false
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --production --frozen-lockfile
+
+      - name: Run Command
+        run: |
+          echo "Running ${{ join(matrix.commands.cmd, ' && ') }}"
+          ${{ join(matrix.commands.cmd, ' && ') }}
