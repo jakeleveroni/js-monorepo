@@ -67,6 +67,7 @@ function getPackageJson() {
     };
 
     cache[cwd] = modifiedPkgJson;
+    console.log("packahejson cache", cache);
     return modifiedPkgJson;
   };
 }
