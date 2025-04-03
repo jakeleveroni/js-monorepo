@@ -33,7 +33,8 @@ jobs:
           echo "$(pwd)";
           echo "$(ls)";
           pushd /home/runner/work/js-monorepo/js-monorepo
-          echo "RESULT=$(bun tasks -a -t pullrequest)" >> $GITHUB_OUTPUT
+          # echo "RESULT=$(bun tasks -a -t pullrequest)" >> $GITHUB_OUTPUT
+          bun tasks -a -t pullrequest
 
       - name: Use output
         run: echo "The output was ${{ steps.matrix-data.outputs.RESULT }}"
