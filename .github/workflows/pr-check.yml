@@ -32,6 +32,7 @@ jobs:
         run: |
           echo "$(pwd)";
           echo "$(ls)";
+          pushd /home/runner/work/js-monorepo/js-monorepo
           echo "RESULT=$(bun tasks -a -t pullrequest)" >> $GITHUB_OUTPUT
 
       - name: Use output
