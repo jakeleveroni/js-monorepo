@@ -30,6 +30,8 @@ jobs:
       - name: Calculate tasks
         id: matrix-data
         run: |
+          pwd;
+          ls;
           echo "RESULT=$(bun tasks -a -t pullrequest)" >> $GITHUB_OUTPUT
 
       - name: Use output
