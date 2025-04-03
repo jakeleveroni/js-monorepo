@@ -46,11 +46,12 @@ function getPackageJson() {
 
     for (const ws of originalWorkspaces) {
       const glob = new Glob(ws);
-
+      console.log("original ws", getRootDir(), ws);
       for await (const pathMatch of glob.scan({
         cwd: getRootDir(),
         onlyFiles: false,
       })) {
+        console.log("match", pathMatch);
         const wsPkgJson = await packageJson(`${getRootDir()}/${pathMatch}`);
 
         explodedWorkspaces.push({
