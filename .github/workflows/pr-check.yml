@@ -30,7 +30,9 @@ jobs:
       - name: Calculate tasks
         id: matrix-data
         run: |
-          echo "RESULT=$(bun tasks -a -t pullrequest)" >> $GITHUB_OUTPUT
+          RESULT=$(bun tasks -a -t pullrequest)
+          echo $RESULT
+          echo "$RESULT" >> $GITHUB_OUTPUT
 
       - name: Use output
         run: echo "The output was ${{ steps.matrix-data.outputs.RESULT }}"

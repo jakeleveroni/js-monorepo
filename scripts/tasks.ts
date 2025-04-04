@@ -38,6 +38,12 @@ const { values, tokens } = parseArgs({
       short: "t",
       multiple: false,
     },
+    log: {
+      type: "boolean",
+      short: "l",
+      multiple: false,
+      default: false,
+    },
     help: {
       type: "boolean",
       short: "h",
@@ -50,7 +56,9 @@ const { values, tokens } = parseArgs({
   tokens: true,
 });
 
-const { trigger, help, all, workspaces } = values;
+const { trigger, help, all, workspaces, log } = values;
+
+const errors: string[] = [];
 
 if (!trigger || !VALID_TRIGGERS[trigger]) {
   console.error(
@@ -96,8 +104,10 @@ if (all) {
 }
 
 if (workspaces?.length === 0) {
-  console.warn("No workspaces provided, terminating early.");
-  process.exit(-2);
+  if (log) {
+    console.warn("No workspaces provided, terminating early.");
+  }
+  process.exit(-1);
 }
 
 const passthroughs = parsePassthroughs(tokens ?? []);
@@ -107,7 +117,9 @@ for (const ws of includedWorkspaces) {
   try {
     await file(`${ws.cwd}/bunrepo.config.ts`).stat();
   } catch {
-    console.warn(`No bunrepo config file found for workspace: ${ws.name}`);
+    if (log) {
+      console.warn(`No bunrepo config file found for workspace: ${ws.name}`);
+    }
     continue;
   }
 
@@ -135,10 +147,11 @@ for (const ws of includedWorkspaces) {
       );
     }
   } catch (err) {
-    console.log(`Unable to resolve ${ws.name} config`, err);
+    if (log) {
+      console.log(`Unable to resolve ${ws.name} config`, err);
+    }
     continue;
   }
 }
 
-console.log("Task generation complete.");
-console.log(JSON.stringify(tasks, null, 2));
+console.log(JSON.stringify({ tasks, errors }));
