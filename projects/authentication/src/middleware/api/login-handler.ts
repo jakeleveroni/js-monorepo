@@ -18,18 +18,18 @@ const login: RequestHandler<unknown, unknown, { username?: string; password?: st
     res.status(400).json({ message: 'missing username or password.', code: ERRS.CGQL_0000 });
     return;
   }
-  const rSet = await client.query<Pick<UserRecord, 'username' | 'password' | 'role'>>(
+  const rSet = await client.query<Pick<UserRecord, 'username' | 'password' | 'role_id'>>(
     'SELECT u.username, u.password, r.name as role FROM users u LEFT JOIN roles r ON u.role_id = r.id WHERE username = $1',
     [username],
   );
 
-  if (rSet.rows.length != 1) {
+  if (rSet.rows.length !== 1) {
     res.status(401).json({ message: 'Not authorized', code: ERRS.CGQL_0001 });
     return;
   }
 
   const user = rSet.rows[0];
-  const { password: hashedPassword, role } = user;
+  const { password: hashedPassword, role_id } = user;
 
   const hashMatch = await bcrypt.compare(password, hashedPassword);
   if (!hashMatch) {
@@ -50,7 +50,7 @@ const login: RequestHandler<unknown, unknown, { username?: string; password?: st
   // generate access token
   jwt.sign(
     // TODO fetch roles and encode here
-    { username, role } satisfies JwtTokenContent,
+    { username, role_id } satisfies JwtTokenContent,
     process.env.JWT_SECRET,
     {
       expiresIn: (process.env.JWT_EXPIRE_TIME as StringValue) ?? '1h',
@@ -59,7 +59,7 @@ const login: RequestHandler<unknown, unknown, { username?: string; password?: st
       jwtid: crypto.randomUUID(),
       subject: username,
     },
-    function (err, token) {
+    (err, token) => {
       if (err) {
         logger.error(err, 'Token generation failed');
         res.status(500).json({
@@ -73,6 +73,7 @@ const login: RequestHandler<unknown, unknown, { username?: string; password?: st
       // generate refresh token
       jwt.sign(
         { username },
+        // biome-ignore lint/style/noNonNullAssertion: already handled in outter closure
         process.env.JWT_REFRESH_SECRET!,
         {
           expiresIn: (process.env.JWT_EXPIRE_TIME as StringValue) ?? '4h',
@@ -81,7 +82,7 @@ const login: RequestHandler<unknown, unknown, { username?: string; password?: st
           jwtid: crypto.randomUUID(),
           subject: username,
         },
-        async function (refreshErr, refreshToken) {
+        async (refreshErr, refreshToken) => {
           if (refreshErr) {
             logger.error(refreshErr, 'Refresh token generation failed');
             res.status(500).json({
@@ -155,7 +156,7 @@ const refresh: RequestHandler = async (req, res) => {
     return;
   }
 
-  jwt.verify(rSet.rows[0].token, process.env.JWT_REFRESH_SECRET, async function (error, decoded) {
+  jwt.verify(rSet.rows[0].token, process.env.JWT_REFRESH_SECRET, async (error, decoded) => {
     if (error || !decoded || typeof decoded === 'string' || !decoded.username) {
       try {
         await client.query('DELETE FROM refresh_tokens WHERE token = $1', [refreshToken]);
@@ -167,12 +168,12 @@ const refresh: RequestHandler = async (req, res) => {
           message: 'Unable to authenticate at this time.',
           code: ERRS.CGQL_0010,
         });
-        return;
       }
+      return
     }
 
     try {
-      const userRSet = await client.query<Pick<UserRecord, 'username' | 'role'>>(
+      const userRSet = await client.query<Pick<UserRecord, 'username' | 'role_id'>>(
         `
           SELECT u.username, r.name as role 
             FROM users u 
@@ -192,9 +193,10 @@ const refresh: RequestHandler = async (req, res) => {
       // sign new auth token
       jwt.sign(
         userRSet.rows[0],
+        // biome-ignore lint/style/noNonNullAssertion: already handled in outter closure
         process.env.JWT_SECRET!,
         { algorithm: 'RS256', expiresIn: '1h' },
-        function (error, newToken) {
+        (error, newToken) => {
           if (error || !newToken) {
             logger.error(error, 'Unable to generate new access token.');
             client.release();
@@ -227,7 +229,6 @@ const refresh: RequestHandler = async (req, res) => {
         res.status(error ? 500 : 401).json({
           message: 'Unable to authenticate at this time.',
         });
-        return;
       }
     }
   });
@@ -243,7 +244,7 @@ const logout: RequestHandler = async (req, res, next) => {
   }
 
   const client = await pool.connect();
-  await client.query(`DELELTE FROM refresh_tokens WHERE token = $1`, [refreshToken]);
+  await client.query('DELELTE FROM refresh_tokens WHERE token = $1', [refreshToken]);
 
   res.clearCookie('auth_token');
   res.clearCookie('refresh_token');
