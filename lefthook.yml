@@ -4,14 +4,13 @@ pre-commit:
     biome:
       glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
       run: bunx --bun @biomejs/biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
-      stage_fixed: true
     tsc:
-      glob: "**/projects/*.{ts,tsx}"
-      stage_fixed: true
+      glob: "projects/**/*.{ts,tsx}"
       run: |+
         # Strip "projects/" prefix and everything after the following "/"
-        WORKSPACE=$(echo {$staged_files} | tr ' ' '\n' | sed -E 's|^projects/([^/]*)/.*|\\1|' | tr '\n' ' ')
+        echo "FILES {staged_files}"
+        WORKSPACE=$(echo {staged_files} | tr ' ' '\n' | sed -E 's|^projects/([^/]*)/.*|\\1|' | tr '\n' ' ')
 
         echo "Running bun typecheck on workspace $WORKSPACE"
-        bun typecheck -w $WORKSPACE -s check
+        bun ws -w $WORKSPACE -s check
           
