@@ -12,6 +12,8 @@ permissions:
 jobs:
   setup:
     runs-on: ubuntu-latest
+    outputs:
+      tasks: ${{ steps.calculate-tasks.outputs.tasks }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -28,21 +30,19 @@ jobs:
         # TODO: figure out how to get affected here so i can only run tasks on the affected workspaces. for now we run over all of them.
 
       - name: Calculate tasks
-        id: matrix-data
+        id: calculate-tasks
         run: |
           RESULT=$(bun tasks -a -t pullrequest)
+          echo "Task generation output:"
           echo $RESULT
-          echo "$RESULT" >> $GITHUB_OUTPUT
-
-      - name: Use output
-        run: echo "The output was ${{ steps.matrix-data.outputs.RESULT }}"
+          echo "tasks=$RESULT" >> $GITHUB_OUTPUT
 
   run-tasks:
     needs: setup
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        commands: ${{ fromJSON(needs.setup.outputs.RESULT) }}
+        commands: ${{ fromJSON(needs.setup.outputs.tasks) }}
       fail-fast: false
     steps:
       - name: Checkout Repo
