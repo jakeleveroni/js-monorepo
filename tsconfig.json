@@ -1,0 +1,9 @@
+{
+    "exclude": ["**/.github", "**/.vscode", "**/node_modules"],
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "types": ["bun-types"],
+        "noEmit": true,
+    }
+}
