@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "bunx --bun astro dev",
     "start": "bunx --bun  astro dev",
+    "check": "bunx --bun tsc",
     "build": "bunx --bun astro build",
     "preview": "bunx --bun astro preview",
     "astro": "bunx --bun astro"
