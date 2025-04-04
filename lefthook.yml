@@ -10,15 +10,18 @@ pre-commit:
         # all hail gpt
         echo "Staged files: {staged_files}"
 
-        # Extract unique workspace names
-        mapfile -t PROJECTS < <(
-          echo {staged_files} \
-          | tr ' ' '\n' \
+        TMP=$(mktemp)
+        echo {staged_files} | tr ' ' '\n' \
           | sed -E -n 's|^projects/([^/]+)/.*|\1|p' \
-          | sort -u
-        )
+          | sort -u > "$TMP"
 
-        # Construct bun workspace flags
+        PROJECTS=()
+        while IFS= read -r line; do
+          PROJECTS+=("$line")
+        done < "$TMP"
+        rm "$TMP"
+
+        # Build args for bun ws
         WORKSPACE_FLAGS=""
         for p in "${PROJECTS[@]}"; do
           WORKSPACE_FLAGS="$WORKSPACE_FLAGS -w $p"
