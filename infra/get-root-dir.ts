@@ -19,8 +19,9 @@ function memoizedRootDir() {
 
     const nestedDepth = dirParts.length - 1 - rootIndex;
     const rootDir = "/" + dirParts.slice(0, -nestedDepth).join("/");
-    cache = rootDir;
-    return rootDir;
+    const root = process.env.CI ? `${rootDir}/${target}` : rootDir;
+    cache = root;
+    return root;
   };
 }
 

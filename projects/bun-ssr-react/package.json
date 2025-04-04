@@ -3,13 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "aliases": [
-    "ssr"
-  ],
+  "aliases": ["ssr"],
   "scripts": {
     "dev:client": "bunx --bun vite",
     "dev:server": "bun --watch src/server/server.tsx",
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "check": "bunx --bun tsc",
     "build:client": "bunx --bun vite build",
     "build:server": "bun build src/server/server.tsx --outdir dist/server --target bun",
     "build": "npm run build:client && npm run build:server",

@@ -1,6 +1,7 @@
 import { file } from "bun";
 import { parseArgs } from "util";
 import getPackageJson from "../infra/get-package-json";
+import parsePassthroughs from "../infra/parse-passthroughs";
 
 const { values, tokens } = parseArgs({
   args: Bun.argv,
@@ -57,15 +58,7 @@ async function run() {
     return;
   }
 
-  const ptIndex = tokens.findIndex((x) => x.kind === "option-terminator");
-  const passthroughs =
-    ptIndex > -1
-      ? tokens
-          .slice(ptIndex ?? tokens.length)
-          .filter((x) => x.kind === "option" || x.kind === "positional")
-          .map((x) => x.value)
-          .filter((x) => x !== undefined)
-      : [];
+  const passthroughs = parsePassthroughs(tokens ?? []);
 
   if (!values.workspace) {
     console.error(

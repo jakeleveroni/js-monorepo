@@ -1,15 +1,14 @@
-import { type RefObject, useEffect, useRef } from 'react';
-import {
-  Vector3,
-  type PerspectiveCamera as ThreePerspectiveCamera,
-  type Mesh,
-  Quaternion,
-  AxesHelper,
-} from 'three';
-import { useKeyboardControls, PerspectiveCamera, Helper } from '@react-three/drei';
+import { PerspectiveCamera, useKeyboardControls } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { CapsuleCollider, RigidBody } from '@react-three/rapier';
 import type { RapierRigidBody } from '@react-three/rapier';
+import { type RefObject, useEffect, useRef } from 'react';
+import {
+  type Mesh,
+  Quaternion,
+  type PerspectiveCamera as ThreePerspectiveCamera,
+  Vector3,
+} from 'three';
 import type { Controls } from '../controls/player-controls';
 import { useDebugContext } from '../debug/debug-provider';
 
@@ -34,7 +33,7 @@ export function Player(props: Props) {
 
   useCameraFollow(cameraRef, rigidBodyRef);
 
-  useFrame((_, delta) => {
+  useFrame(() => {
     if (!rigidBodyRef.current) return;
 
     const pressed = get();

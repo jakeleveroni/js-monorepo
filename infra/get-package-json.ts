@@ -1,6 +1,12 @@
 import { file, Glob } from "bun";
 import getRootDir from "./get-root-dir";
 
+export type IndexedWorkspaces = Array<{
+  name: string;
+  cwd: string;
+  aliases: string[];
+}>;
+
 export type PackageJSON = {
   name: string;
   aliases: string[];
@@ -9,7 +15,7 @@ export type PackageJSON = {
   main?: string;
   scripts?: Record<string, string>;
   workspaces?: string[];
-  indexedWorkspaces?: Array<{ name: string; cwd: string; aliases: string[] }>;
+  indexedWorkspaces?: IndexedWorkspaces;
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
@@ -40,7 +46,6 @@ function getPackageJson() {
 
     for (const ws of originalWorkspaces) {
       const glob = new Glob(ws);
-
       for await (const pathMatch of glob.scan({
         cwd: getRootDir(),
         onlyFiles: false,

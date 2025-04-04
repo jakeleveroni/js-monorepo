@@ -8,7 +8,8 @@
   ],
   "scripts": {
     "ws": "bun ./scripts/workspace.ts",
-    "affected": "bun ./scripts/get-affected-workspaces.ts"
+    "affected": "bun ./scripts/get-affected-workspaces.ts",
+    "tasks": "bun ./scripts/tasks.ts"
   },
   "dependencies": {},
   "devDependencies": {
