@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        commands: ${{ fromJSON(needs.setup.outputs.tasks) }}
+        commands: ${{ fromJSON(needs.setup.outputs.tasks.tasks) }}
       fail-fast: false
     steps:
       - name: Checkout Repo
