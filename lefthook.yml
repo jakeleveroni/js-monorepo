@@ -1,32 +1,32 @@
-# pre-commit:
-#   commands:
-#     # precommit biome hooks
-#     biome:
-#       glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
-#       run: bunx --bun @biomejs/biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
-#     tsc:
-#       glob: "projects/**/*.{ts,tsx}"
-#       run: |+
-#         # all hail gpt
-#         echo "Staged files: {staged_files}"
+pre-commit:
+  commands:
+    # precommit biome hooks
+    biome:
+      glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
+      run: bunx --bun @biomejs/biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
+    tsc:
+      glob: "projects/**/*.{ts,tsx}"
+      run: |+
+        # all hail gpt
+        echo "Staged files: {staged_files}"
 
-#         TMP=$(mktemp)
-#         echo {staged_files} | tr ' ' '\n' \
-#           | sed -E -n 's|^projects/([^/]+)/.*|\1|p' \
-#           | sort -u > "$TMP"
+        TMP=$(mktemp)
+        echo {staged_files} | tr ' ' '\n' \
+          | sed -E -n 's|^projects/([^/]+)/.*|\1|p' \
+          | sort -u > "$TMP"
 
-#         PROJECTS=()
-#         while IFS= read -r line; do
-#           PROJECTS+=("$line")
-#         done < "$TMP"
-#         rm "$TMP"
+        PROJECTS=()
+        while IFS= read -r line; do
+          PROJECTS+=("$line")
+        done < "$TMP"
+        rm "$TMP"
 
-#         # Build args for bun ws
-#         WORKSPACE_FLAGS=""
-#         for p in "${PROJECTS[@]}"; do
-#           WORKSPACE_FLAGS="$WORKSPACE_FLAGS -w $p"
-#         done
+        # Build args for bun ws
+        WORKSPACE_FLAGS=""
+        for p in "${PROJECTS[@]}"; do
+          WORKSPACE_FLAGS="$WORKSPACE_FLAGS -w $p"
+        done
 
-#         echo "Running bun typecheck on workspaces: ${PROJECTS[*]}"
-#         bun ws $WORKSPACE_FLAGS -s check
+        echo "Running bun typecheck on workspaces: ${PROJECTS[*]}"
+        bun ws $WORKSPACE_FLAGS -s check
           
