@@ -111,7 +111,7 @@ if (workspaces?.length === 0) {
 }
 
 const passthroughs = parsePassthroughs(tokens ?? []);
-const tasks: Array<Array<Task>> = [];
+const tasks: Array<Task> = [];
 
 for (const ws of includedWorkspaces) {
   try {
@@ -135,16 +135,17 @@ for (const ws of includedWorkspaces) {
       resolvedConfig.tasks[trigger as keyof BunrepoConfig["tasks"]];
 
     if (wsTasks) {
-      tasks.push(
-        wsTasks.map((cmd) => {
-          return {
-            cmd,
-            workspace: ws.name,
-            cwd: ws.cwd,
-            passthroughs,
-          } satisfies Task;
-        })
-      );
+        const cmds = wsTasks.reduce((acc, curr) => {
+          return [...acc, curr.join(' ')]
+        }, [])
+
+        const derivedWsTasks = {
+          cmd: cmds,
+          workspace: ws.name,
+          cwd: ws.cwd,
+          passthroughs,
+        } satisfies Task;
+        tasks.push(derivedWsTasks)
     }
   } catch (err) {
     if (log) {
@@ -153,5 +154,6 @@ for (const ws of includedWorkspaces) {
     continue;
   }
 }
+
 
 console.log(JSON.stringify({ tasks, errors }));

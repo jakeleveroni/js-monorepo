@@ -17,7 +17,8 @@
     }
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "check": "tsc"
   },
   "devDependencies": {
     "typescript": "~5.7.2",
