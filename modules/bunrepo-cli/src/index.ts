@@ -1,14 +1,23 @@
 #! /usr/bin/env bun
 import { parseArgs } from 'util';
-import { parsePassthroughs } from '@ldlabs/utils';
+import { type BunfigLifecycleHook, parsePassthroughs } from '@ldlabs/utils';
 import yargs, { type MiddlewareFunction } from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { workspaces } from './commands/workspaces';
 import { getAffectedWorkspaces } from './commands/get-affected-workspace';
+import { getTasks } from './commands/tasks';
 
 type WorkspaceCmdType = {
   workspaces: string[];
   script: string;
+  passthroughs: string[];
+};
+
+type TaskCmdType = {
+  workspaces: string[];
+  trigger: string;
+  all: boolean;
+  log: boolean;
   passthroughs: string[];
 };
 
@@ -42,15 +51,21 @@ yargs(hideBin(process.argv))
       workspaces(argv.workspaces, argv.script, argv.passthroughs);
     },
   )
-  .command<WorkspaceCmdType>(
+  .command<TaskCmdType>(
     ['tasks'],
     'Derives tasks based on the specified workspaces and trigger',
     (yargs) =>
       yargs
         .option('all', {
-          description: 'Flag indicating all workspaces',
+          description: 'Flag indicating all workspaces, default false',
           type: 'boolean',
           alias: 'a',
+          default: false,
+        })
+        .option('log', {
+          description: 'Flag indicating whether or not to log, default false.',
+          type: 'boolean',
+          alias: 'l',
           default: false,
         })
         .option('workspaces', {
@@ -65,14 +80,20 @@ yargs(hideBin(process.argv))
           alias: 't',
           demandOption: true,
         }),
-    (argv) => {
-      getAffectedWorkspaces();
+    async (argv) => {
+      await getTasks({
+        workspaces: argv.workspaces,
+        all: argv.all,
+        log: argv.log,
+        trigger: argv.trigger as BunfigLifecycleHook,
+        passthroughs: argv.passthroughs,
+      });
     },
   )
   .command<WorkspaceCmdType>(
     ['affected', 'diff'],
     'Derives which workspaces were affected from githubs perspective. Currently does not take into account a dependency graph.',
-    (yargs) => {},
-    async (argv) => console.log(JSON.stringify(await getAffectedWorkspaces(), null, 2)),
+    () => {},
+    async () => console.log(JSON.stringify(await getAffectedWorkspaces(), null, 2)),
   )
   .parse();
