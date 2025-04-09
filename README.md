@@ -5,6 +5,18 @@ This monorepo is a playground for my JS/TS based projects. I am going to be usin
 [Monorepo Documentation](https://jakeleveroni.github.io/js-monorepo/repo/)
 [Projects Documentation](https://jakeleveroni.github.io/js-monorepo/projects/)
 
+## bunrepo-cli setup
+
+You need to link the bunrepo-cli module before you run `bun install`:
+
+```sh
+cd modules/bunrepo-cli
+bun link
+cd ../..
+bun install
+```
+
+Once you have completed the initial install the `bunr` command should be available to you. More to come...
 
 ## Bun Based Projects
 

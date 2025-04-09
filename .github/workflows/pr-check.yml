@@ -51,6 +51,13 @@ jobs:
       - name: Install bun
         uses: oven-sh/setup-bun@v2
 
+      - name: Setup bunrepo cli
+        run: |
+          echo "Linking bunrepo-cli"
+          pushd modules/bunrepo-cli;
+          bun link;
+          popd;
+
       - name: Install dependencies
         run: bun install --production --frozen-lockfile
 

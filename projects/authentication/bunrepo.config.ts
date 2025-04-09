@@ -6,9 +6,9 @@ export default () =>
       name: 'authentication',
     },
     tasks: {
-      pullrequest: [['bunx', 'biome', 'format'], ['biome', 'lint'], ['bun', 'run', 'build']],
+      pullrequest: [['bunx --bun biome format'], ['bunx --bun biome lint'], ['bun run build']],
       prebuild: false,
-      build: [['bun', 'run', 'build']],
+      build: [['bun run build']],
       postbuild: false,
       finalize: false,
     },

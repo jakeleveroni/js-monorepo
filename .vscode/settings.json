@@ -5,7 +5,19 @@
     "quickfix.biome": "explicit"
   },
   "explorer.compactFolders": false,
-  "[github-actions-workflow]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
 }

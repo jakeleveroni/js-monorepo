@@ -1,9 +1,4 @@
-export type BunfigLifecycleHook =
-  | "pullrequest"
-  | "prebuild"
-  | "build"
-  | "postbuild"
-  | "finalize";
+export type BunfigLifecycleHook = 'pullrequest' | 'prebuild' | 'build' | 'postbuild' | 'finalize';
 
 export type BunrepoConfig = {
   meta: Record<string, unknown>;
