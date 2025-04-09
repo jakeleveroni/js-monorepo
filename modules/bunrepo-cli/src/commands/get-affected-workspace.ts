@@ -1,19 +1,17 @@
-import getPackageJson from '../infra/get-package-json';
-import getRootDir from '../infra/get-root-dir';
-
-const rootDir = getRootDir();
-const rootPkgJson = await getPackageJson();
-
-const workspaces = rootPkgJson.indexedWorkspaces ?? [];
-const affected: Array<{
-  cwd: string;
-  workspace: string;
-  files: Array<{ relativePath: string; absolutePath: string }>;
-}> = [];
+import { getPackageJson, getRootDir } from '@ldlabs/utils';
 
 export async function getAffectedWorkspaces() {
+  const rootPkgJson = await getPackageJson();
+
+  const workspaces = rootPkgJson.indexedWorkspaces ?? [];
+  const affected: Array<{
+    cwd: string;
+    workspace: string;
+    files: Array<{ relativePath: string; absolutePath: string }>;
+  }> = [];
+
   const promises = workspaces.map((ws) => {
-    return new Promise(async (resolve) => {
+    return new Promise((resolve) => {
       Bun.spawn({
         cmd: ['git', 'diff', '--quiet', '.'],
         cwd: ws.cwd,
@@ -47,6 +45,7 @@ async function getModifiedFiles(
   cwd: string,
   args: Args = { staged: true, unstaged: true, all: false },
 ) {
+  const rootDir = getRootDir();
   const cmd = ['git', '--no-pager', 'diff', '--name-only'];
   if (!args.all) {
     if (args.staged && args.unstaged) {
