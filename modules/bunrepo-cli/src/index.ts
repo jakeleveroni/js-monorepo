@@ -3,9 +3,9 @@ import { parseArgs } from 'util';
 import { type BunfigLifecycleHook, parsePassthroughs } from '@ldlabs/utils';
 import yargs, { type MiddlewareFunction } from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { workspaces } from './commands/workspaces';
 import { getAffectedWorkspaces } from './commands/get-affected-workspace';
 import { getTasks } from './commands/tasks';
+import { workspaces } from './commands/workspaces';
 
 type WorkspaceCmdType = {
   workspaces: string[];
