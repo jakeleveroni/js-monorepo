@@ -21,6 +21,10 @@ type TaskCmdType = {
   passthroughs: string[];
 };
 
+type AffectedCmdType = {
+  format: 'verbose' | 'name-array';
+};
+
 const passthroughMiddleware: MiddlewareFunction = (argv) => {
   const { tokens } = parseArgs({ argv: Bun.argv, tokens: true, strict: false });
   const passthroughs = parsePassthroughs(tokens);
@@ -90,10 +94,18 @@ yargs(hideBin(process.argv))
       });
     },
   )
-  .command<WorkspaceCmdType>(
+  .command<AffectedCmdType>(
     ['affected', 'diff'],
     'Derives which workspaces were affected from githubs perspective. Currently does not take into account a dependency graph.',
-    () => {},
-    async () => console.log(JSON.stringify(await getAffectedWorkspaces(), null, 2)),
+    (yargs) => {
+      yargs.option('format', {
+        description: 'The format you want the output in: verbose | name-array',
+        type: 'string',
+        alias: 'f',
+        default: 'verbose',
+        choices: ['verbose', 'name-array'],
+      });
+    },
+    async (argv) => console.log(JSON.stringify(await getAffectedWorkspaces(argv.format), null, 2)),
   )
   .parse();

@@ -1,17 +1,21 @@
 import { getPackageJson, getRootDir } from '@ldlabs/utils';
 
-export async function getAffectedWorkspaces() {
+type OutputFormat = {
+  cwd: string;
+  workspace: string;
+  files: {
+    absolutePath: string;
+    relativePath: string;
+  }[];
+};
+
+export async function getAffectedWorkspaces(format: 'verbose' | 'name-array') {
   const rootPkgJson = await getPackageJson();
 
   const workspaces = rootPkgJson.indexedWorkspaces ?? [];
-  const affected: Array<{
-    cwd: string;
-    workspace: string;
-    files: Array<{ relativePath: string; absolutePath: string }>;
-  }> = [];
 
   const promises = workspaces.map((ws) => {
-    return new Promise((resolve) => {
+    return new Promise<OutputFormat | undefined>((resolve) => {
       Bun.spawn({
         cmd: ['git', 'diff', '--quiet', '.'],
         cwd: ws.cwd,
@@ -19,20 +23,30 @@ export async function getAffectedWorkspaces() {
         onExit: async (info) => {
           if (info.exitCode === 1) {
             const allAffectedFiles = await getModifiedFiles(ws.cwd);
-            affected.push({
+
+            resolve({
               cwd: ws.cwd,
               workspace: ws.name,
               files: allAffectedFiles ?? [],
             });
           }
-          resolve(true);
+
+          resolve(undefined);
         },
       });
     });
   });
 
-  await Promise.allSettled(promises);
-  return affected;
+  const results = await Promise.allSettled(promises);
+  const affected = results.filter((x) => x.status === 'fulfilled' && x.value);
+
+  if (format === 'name-array') {
+    return (affected as PromiseFulfilledResult<OutputFormat>[]).reduce((acc, curr) => {
+      return acc.concat(curr.value.files.map((x) => x.absolutePath));
+    }, [] as string[]);
+  }
+
+  return (affected as PromiseFulfilledResult<OutputFormat>[]).map((x) => x.value);
 }
 
 type Args = {
@@ -70,6 +84,7 @@ async function getModifiedFiles(
   }
 
   const files = stdout?.split('\n').filter(Boolean) ?? [];
+
   return files.map((file) => ({
     relativePath: file,
     absolutePath: `${rootDir}/${file}`,

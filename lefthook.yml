@@ -7,6 +7,7 @@ pre-commit:
     tsc:
       glob: "projects/**/*.{ts,tsx}"
       run: |+
+        echo $(bunr diff -f name-array)
         # all hail gpt
         echo "Staged files: {staged_files}"
 
