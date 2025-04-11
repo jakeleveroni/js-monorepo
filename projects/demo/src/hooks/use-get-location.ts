@@ -13,9 +13,7 @@ export function useGetLocation() {
     );
   }, []);
 
-  console.log(location);
-
   return {
-    location: location ?? { coords: { latitude: 34.111, longitude: 118.111 } },
+    location,
   };
 }

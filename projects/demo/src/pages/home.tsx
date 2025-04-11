@@ -3,18 +3,22 @@ import { useGetWeather } from '../hooks/data/use-get-weather';
 import { useGetLocation } from '../hooks/use-get-location';
 
 export default function Component() {
-  const [units, setUnits] = useState<'c' | 'f'>();
+  const [units, setUnits] = useState<'c' | 'f'>('c');
   const { location } = useGetLocation();
-  const { loading, data, error } = useGetWeather(
-    location?.coords.latitude,
-    location?.coords.longitude,
-  );
+  const { isLoading, data, error } = useGetWeather({
+    lat: location?.coords.latitude,
+    long: location?.coords.longitude,
+    enabled: !!location,
+  });
 
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  const [temp] = useState<number>((data as any)?.main?.temp ?? 0);
-  const [imperialTemp] = useState((temp - 32) / (9 / 5));
+  const formatTemp = () => {
+    if (units === 'c') {
+      return data.main.temp ?? 0;
+    }
+    return (data.main.temp * 9) / 5 + 32;
+  };
 
-  if (loading) {
+  if (isLoading) {
     return <p>Loading</p>;
   }
 
@@ -31,7 +35,9 @@ export default function Component() {
   return (
     <div className="w-full p-8 rounded-xl bg-blue-200 text-center">
       <h1 className="text-2xl font-bold">{parsedData.name}</h1>
-      <p>{units === 'c' ? temp : imperialTemp}</p>
+      <p>
+        {formatTemp()} {units.toUpperCase()}
+      </p>
       <button onClick={() => setUnits(units === 'c' ? 'f' : 'c')} type="button">
         Convert
       </button>
