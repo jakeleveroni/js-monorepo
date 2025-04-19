@@ -1,0 +1,97 @@
+body {
+  margin: 0;
+  font-family: monospace;
+  background-color: whitesmoke;
+}
+
+main {
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+main > * {
+  box-shadow: 0 0 1rem 0.25rem #8080808f;
+}
+
+.instructions {
+  background-color: #454545;
+  border-radius: 1rem;
+  border: 2px solid #303030;
+  color: white;
+  padding: 1rem;
+  width: 20rem;
+  min-width: 20rem;
+}
+
+.instructions > h1 {
+  margin-top: 0;
+}
+
+.instructions > .summary {
+  font-size: 120%;
+  line-height: 130%;
+  margin-bottom: 1rem;
+}
+
+.instructions > a:link {
+  font-size: 120%;
+  color: white;
+}
+
+.instructions > a:visited {
+  color: whitesmoke;
+}
+
+.canvas-container {
+  position: relative;
+  border: 4px solid #282828;
+}
+
+.canvas-container > canvas {
+  display: block;
+}
+
+.canvas-container > .game-over {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-weight: bold;
+  font-family: sans-serif;
+  font-size: 4rem;
+  color: red;
+  background-color: rgba(0, 0, 0, 0.5);
+  text-shadow:
+    1px 1px 0 #f5f5f5,
+    -1px 1px 0 #f5f5f5,
+    1px -1px 0 #f5f5f5,
+    -1px -1px 0 #f5f5f5;
+}
+
+.canvas-container > .game-over > button {
+  margin-top: 1rem;
+  font-size: 1rem;
+  border: 1px solid white;
+  padding: 0.4rem 0.7rem;
+  background-color: whitesmoke;
+  border-radius: 0.25rem;
+  transition: background-color ease 0.15s;
+}
+
+.canvas-container > .game-over > button:hover {
+  background-color: #d3d3d3;
+}
+
+.canvas-container > .game-over > button:active {
+  background-color: #c0c0c0;
+}

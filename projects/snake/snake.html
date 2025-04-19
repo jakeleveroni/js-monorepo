@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Snake</title>
+  <link rel="stylesheet" href="grid_game.css">
+</head>
+<body>
+  <main>
+    <div class="instructions">
+      <h1>Snake</h1>
+      <div class="summary">
+        Create a game of snake. The snake should move around the board in the direction of the arrow keys. An apple should be randomly placed on an empty space on the board. When the snake eats the apple, the snake should grow by one block, and a new apple should be placed. If the snake runs into itself or the game border, the game is over.
+      </div>
+      <a href="example.html" target="_blank">Example</a>
+    </div>
+    <div class="canvas-container">
+      <div class="game-over">
+        <span>Game Over</span>
+        <button>Start Over</button>
+      </div>
+      <canvas></canvas>
+    </div>
+  </main>
+  <script src="grid_game.js"></script>
+  <script id="implementation_script" src="snake.js"></script>
+</body>
+</html>
