@@ -1,5 +1,11 @@
-import { file, Glob } from "bun";
-import getRootDir from "./get-root-dir";
+import { Glob, file } from 'bun';
+import getRootDir from './get-root-dir';
+
+export type IndexedWorkspaces = Array<{
+  name: string;
+  cwd: string;
+  aliases: string[];
+}>;
 
 export type PackageJSON = {
   name: string;
@@ -9,7 +15,7 @@ export type PackageJSON = {
   main?: string;
   scripts?: Record<string, string>;
   workspaces?: string[];
-  indexedWorkspaces?: Array<{ name: string; cwd: string; aliases: string[] }>;
+  indexedWorkspaces?: IndexedWorkspaces;
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
@@ -20,7 +26,7 @@ export type PackageJSON = {
  * HOC method that reads in package.json & caches it, on subsequent calls the cached version is returne
  */
 function getPackageJson() {
-  let cache: Record<string, PackageJSON> = {};
+  const cache: Record<string, PackageJSON> = {};
 
   /**
    * returns a cached version of the package json if available
@@ -28,19 +34,16 @@ function getPackageJson() {
    *
    * @throws throws Error if file fails to open or does not exist
    */
-  return async function packageJson(
-    cwd: string = getRootDir()
-  ): Promise<PackageJSON> {
+  return async function packageJson(cwd: string = getRootDir()): Promise<PackageJSON> {
     if (cache[cwd]) {
       return cache[cwd];
     }
     const pkgJson: PackageJSON = await file(`${cwd}/package.json`).json();
     const originalWorkspaces = pkgJson.workspaces ?? [];
-    const explodedWorkspaces: PackageJSON["indexedWorkspaces"] = [];
+    const explodedWorkspaces: PackageJSON['indexedWorkspaces'] = [];
 
     for (const ws of originalWorkspaces) {
       const glob = new Glob(ws);
-
       for await (const pathMatch of glob.scan({
         cwd: getRootDir(),
         onlyFiles: false,
@@ -48,7 +51,7 @@ function getPackageJson() {
         const wsPkgJson = await packageJson(`${getRootDir()}/${pathMatch}`);
 
         explodedWorkspaces.push({
-          name: pathMatch.split("/")[1],
+          name: pathMatch.split('/')[1],
           cwd: `${getRootDir()}/${pathMatch}`,
           aliases: wsPkgJson.aliases ?? [],
         });

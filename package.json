@@ -7,12 +7,14 @@
     "modules/*"
   ],
   "scripts": {
-    "ws": "bun ./scripts/workspace.ts",
-    "affected": "bun ./scripts/get-affected-workspaces.ts"
+    "ws": "bun ./scripts/workspaces.ts",
+    "affected": "bun ./scripts/get-affected-workspaces.ts",
+    "tasks": "bun ./scripts/tasks.ts"
   },
   "dependencies": {},
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "lefthook": "^1.11.6"
+    "lefthook": "^1.11.6",
+    "bunr": "link:@ldlabs/bunrepo-cli"
   }
 }

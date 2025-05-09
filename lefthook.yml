@@ -1,7 +1,33 @@
 pre-commit:
   commands:
     # precommit biome hooks
-    check:
+    biome:
       glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
-      run: npx @biomejs/biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
-      stage_fixed: true
+      run: bunx --bun @biomejs/biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
+    tsc:
+      glob: "projects/**/*.{ts,tsx},modules/**/*.{ts,tsx}"
+      run: |+
+        echo $(bunr diff -f name-array)
+        # all hail gpt
+        echo "Staged files: {staged_files}"
+
+        TMP=$(mktemp)
+        echo {staged_files} | tr ' ' '\n' \
+          | sed -E -n 's|^projects/([^/]+)/.*|\1|p' \
+          | sort -u > "$TMP"
+
+        PROJECTS=()
+        while IFS= read -r line; do
+          PROJECTS+=("$line")
+        done < "$TMP"
+        rm "$TMP"
+
+        # Build args for bun ws
+        WORKSPACE_FLAGS=""
+        for p in "${PROJECTS[@]}"; do
+          WORKSPACE_FLAGS="$WORKSPACE_FLAGS -w $p"
+        done
+
+        echo "Running bun typecheck on workspaces: ${PROJECTS[*]}"
+        bun ws $WORKSPACE_FLAGS -s check
+          
