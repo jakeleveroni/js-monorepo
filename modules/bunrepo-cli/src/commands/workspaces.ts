@@ -56,13 +56,13 @@ async function runWorkspaceScript(cwd: string, script: string, passthrough: (str
     }
 
     isPkgJsonScript().then((isPkgScript) => {
-      console.log('running', [
-        'bun',
-        'run',
-        // biome-ignore lint/style/noNonNullAssertion: this is handled earlier in the script
-        isPkgScript ? script! : `scripts/${script!}.ts`,
-        ...(passthrough.length > 0 ? ['--', ...passthrough] : []),
-      ]);
+      // console.debug('running', [
+      //   'bun',
+      //   'run',
+      //   // biome-ignore lint/style/noNonNullAssertion: this is handled earlier in the script
+      //   isPkgScript ? script! : `scripts/${script!}.ts`,
+      //   ...(passthrough.length > 0 ? ['--', ...passthrough] : []),
+      // ]);
       Bun.spawn({
         cmd: [
           'bun',

@@ -8,7 +8,7 @@ export default () =>
     tasks: {
       pullrequest: [['bunx --bun biome format'], ['bunx --bun biome lint'], ['bun run build']],
       prebuild: false,
-      build: [['bun run build']],
+      build: [['bun run build --mode production']],
       postbuild: false,
       finalize: false,
     },
