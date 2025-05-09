@@ -14,9 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tasks: ${{ steps.calculate-tasks.outputs.tasks }}
+      workload: ${{ steps.store-tasks.outputs.workload }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install bun
         uses: oven-sh/setup-bun@v2
@@ -24,44 +27,64 @@ jobs:
       - name: Check Bun Version
         run: bun --version
 
-      - name: Install dependencies
-        run: bun install --production --frozen-lockfile
-
-        # TODO: figure out how to get affected here so i can only run tasks on the affected workspaces. for now we run over all of them.
+      - name: Install Dependencies
+        id: install-deps
+        run: |
+          cd modules/bunrepo-cli;
+          bun link;
+          cd ../..;
+          bun install;
 
       - name: Calculate tasks
         id: calculate-tasks
         run: |
-          RESULT=$(bun tasks -a -t pullrequest)
-          echo "Task generation output:"
-          echo $RESULT
-          echo "tasks=$RESULT" >> $GITHUB_OUTPUT
+          # tasks command sets github output variable 'tasks' on completion
+          echo "Generating tasks"
+          bunr tasks -a -t pullrequest
+
+      - name: Store tasks
+        id: store-tasks
+        run: |
+          echo "Storing tasks:"
+          echo "${{ toJSON(steps.calculate-tasks.outputs.tasks) }}"
+          echo "workload=${{ toJSON(steps.calculate-tasks.outputs.tasks) }}" >> "$GITHUB_OUTPUT"
 
   run-tasks:
     needs: setup
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        commands: ${{ fromJSON(needs.setup.outputs.tasks.tasks) }}
+        workload: ${{ fromJSON(needs.setup.outputs.workload).include }}
       fail-fast: false
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Setup bunrepo cli
+      - name: Install Dependencies
+        id: install-deps
         run: |
-          echo "Linking bunrepo-cli"
-          pushd modules/bunrepo-cli;
+          cd modules/bunrepo-cli;
           bun link;
-          popd;
+          cd ../..;
+          bun install;
 
-      - name: Install dependencies
-        run: bun install --production --frozen-lockfile
-
-      - name: Run Command
+      - name: Run tasks
+        shell: bash
         run: |
-          echo "Running ${{ join(matrix.commands.cmd, ' && ') }}"
-          ${{ join(matrix.commands.cmd, ' && ') }}
+          echo 'Running tasks';
+          touch workflow.json;
+          echo '${{ toJSON(matrix.workload) }}' >> workload.json;
+
+          echo $(jq -c -r tostring workload.json)
+          FORMATTED_JSON=$(jq -c -r tostring workload.json)
+          echo "Formatted tasks"
+          echo $FORMATTED_JSON
+
+          bunr run --workload "$FORMATTED_JSON";
+
+

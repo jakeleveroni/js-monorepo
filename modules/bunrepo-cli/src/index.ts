@@ -4,6 +4,7 @@ import { type BunfigLifecycleHook, parsePassthroughs } from '@ldlabs/utils';
 import yargs, { type MiddlewareFunction } from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { getAffectedWorkspaces } from './commands/get-affected-workspace';
+import { runWorkload } from './commands/run';
 import { getTasks } from './commands/tasks';
 import { workspaces } from './commands/workspaces';
 
@@ -17,12 +18,15 @@ type TaskCmdType = {
   workspaces: string[];
   trigger: string;
   all: boolean;
-  log: boolean;
   passthroughs: string[];
 };
 
 type AffectedCmdType = {
   format: 'verbose' | 'name-array';
+};
+
+type RunWorkspaceWorkloadCmdType = {
+  workload: string;
 };
 
 const passthroughMiddleware: MiddlewareFunction = (argv) => {
@@ -88,10 +92,23 @@ yargs(hideBin(process.argv))
       await getTasks({
         workspaces: argv.workspaces,
         all: argv.all,
-        log: argv.log,
         trigger: argv.trigger as BunfigLifecycleHook,
-        passthroughs: argv.passthroughs,
       });
+    },
+  )
+  .command<RunWorkspaceWorkloadCmdType>(
+    ['run', 'exec'],
+    'Executes a given workspace workload object',
+    (yargs) =>
+      yargs.option('workload', {
+        description: 'The workload as a JSON string',
+        type: 'string',
+        alias: 'w',
+        demandOption: true,
+      }),
+    // TODO: add a list command to list all commands
+    async (argv) => {
+      runWorkload(argv.workload, true);
     },
   )
   .command<AffectedCmdType>(
@@ -106,6 +123,10 @@ yargs(hideBin(process.argv))
         choices: ['verbose', 'name-array'],
       });
     },
-    async (argv) => console.log(JSON.stringify(await getAffectedWorkspaces(argv.format), null, 2)),
+    async (argv) => {
+      console.log('Affected workspaces:');
+      console.log(JSON.stringify(await getAffectedWorkspaces(argv.format), null, 2));
+    },
   )
+  // TODO: add a list command to list all commands
   .parse();

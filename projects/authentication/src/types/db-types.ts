@@ -6,8 +6,8 @@ export type UserRecord = {
   role_id: number;
 };
 
-export type MinimalUserRecord = Pick<UserRecord, "username" | "role_id" | "id">;
+export type MinimalUserRecord = Pick<UserRecord, 'username' | 'role_id' | 'id'>;
 
-export type Role = "admin" | "manager" | "user";
+export type Role = 'admin' | 'manager' | 'user';
 
-export type Permission = "create" | "edit" | "delete";
+export type Permission = 'create' | 'edit' | 'delete';

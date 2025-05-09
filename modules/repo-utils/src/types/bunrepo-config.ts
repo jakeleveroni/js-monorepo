@@ -2,5 +2,5 @@ export type BunfigLifecycleHook = 'pullrequest' | 'prebuild' | 'build' | 'postbu
 
 export type BunrepoConfig = {
   meta: Record<string, unknown>;
-  tasks: Record<BunfigLifecycleHook, string[][] | false>;
+  tasks: Record<BunfigLifecycleHook, string[] | false>;
 };
