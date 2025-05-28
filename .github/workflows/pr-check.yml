@@ -50,6 +50,7 @@ jobs:
           echo "workload=${{ toJSON(steps.calculate-tasks.outputs.tasks) }}" >> "$GITHUB_OUTPUT"
 
   run-tasks:
+    name: "${{ matrix.workload.name }}"
     needs: setup
     runs-on: ubuntu-latest
     strategy:
@@ -82,8 +83,6 @@ jobs:
 
           echo $(jq -c -r tostring workload.json)
           FORMATTED_JSON=$(jq -c -r tostring workload.json)
-          echo "Formatted tasks"
-          echo $FORMATTED_JSON
 
           bunr run --workload "$FORMATTED_JSON";
 
