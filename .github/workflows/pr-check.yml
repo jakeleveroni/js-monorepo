@@ -50,7 +50,7 @@ jobs:
           echo "workload=${{ toJSON(steps.calculate-tasks.outputs.tasks) }}" >> "$GITHUB_OUTPUT"
 
   run-tasks:
-    name: "${{ matrix.workload.*.name }}"
+    name: "${{ matrix.workload.name }}"
     needs: setup
     runs-on: ubuntu-latest
     strategy:
