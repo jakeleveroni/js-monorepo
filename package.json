@@ -2,17 +2,10 @@
   "private": true,
   "version": "0.0.1",
   "name": "js-monorepo",
-  "workspaces": [
-    "projects/*",
-    "modules/*"
-  ],
-  "scripts": {
-    "ws": "bun ./scripts/workspaces.ts",
-    "affected": "bun ./scripts/get-affected-workspaces.ts",
-    "tasks": "bun ./scripts/tasks.ts"
-  },
+  "workspaces": ["projects/*", "modules/*"],
   "dependencies": {},
   "devDependencies": {
+    "@actions/core": "^1.11.1",
     "@biomejs/biome": "^1.9.4",
     "lefthook": "^1.11.6",
     "bunr": "link:@ldlabs/bunrepo-cli"

@@ -1,7 +1,7 @@
-import jwt, { type JwtPayload } from 'jsonwebtoken';
-import logger from '../utils/logger';
-import pool from '../utils/db-pool';
 import type { RequestHandler } from 'express';
+import jwt, { type JwtPayload } from 'jsonwebtoken';
+import pool from '../utils/db-pool';
+import logger from '../utils/logger';
 
 const authMiddleware: RequestHandler = async (req, res, next) => {
   const token: string | undefined = req.cookies.auth_token;
@@ -21,6 +21,7 @@ const authMiddleware: RequestHandler = async (req, res, next) => {
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err && err.name === 'TokenExpiredError') {
       // if auth token is expired we need to check the refresh token
+      // biome-ignore lint/style/noNonNullAssertion: already handled in outter scope
       jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!, async (rtErr, rtDecoded) => {
         if (rtErr) {
           // clear user session if refresh token is invalid as well

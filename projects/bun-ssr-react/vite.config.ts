@@ -1,7 +1,7 @@
-import { defineConfig, type UserConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import { getCommitSha } from "@ldlabs/utils";
-import { resolve } from "path";
+import { resolve } from 'path';
+import { getCommitSha } from '@ldlabs/utils';
+import react from '@vitejs/plugin-react';
+import { type UserConfig, defineConfig } from 'vite';
 
 export default defineConfig(async () => {
   return {
@@ -11,40 +11,40 @@ export default defineConfig(async () => {
     server: {
       port: 3000,
       proxy: {
-        "/api": "http://localhost:5177",
+        '/api': 'http://localhost:5177',
       },
     },
 
     build: {
-      outDir: "dist/client",
-      target: "es2020",
+      outDir: 'dist/client',
+      target: 'es2020',
       sourcemap: true,
       rollupOptions: {
-        input: resolve(__dirname, "src/client/main.tsx"),
+        input: resolve(__dirname, 'src/client/main.tsx'),
         output: {
           // Generate a simpler filename structure
-          entryFileNames: "main.js",
-          chunkFileNames: "assets/[name]-[hash].js",
-          assetFileNames: "assets/[name]-[hash].[ext]",
+          entryFileNames: 'main.js',
+          chunkFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash].[ext]',
           // Split vendor code into separate chunk
           manualChunks: {
-            vendor: ["react", "react-dom", "react/jsx-runtime"],
+            vendor: ['react', 'react-dom', 'react/jsx-runtime'],
           },
         },
       },
     },
 
     define: {
-      "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       COMMIT: JSON.stringify(await getCommitSha()),
     },
 
     optimizeDeps: {
-      include: ["react", "react-dom"],
+      include: ['react', 'react-dom'],
     },
 
     esbuild: {
-      jsx: "automatic",
+      jsx: 'automatic',
       jsxInject: `import React from 'react'`,
     },
   } satisfies UserConfig;

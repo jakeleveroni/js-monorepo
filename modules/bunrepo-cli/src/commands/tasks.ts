@@ -1,3 +1,4 @@
+import { setFailed, setOutput } from '@actions/core';
 import {
   type BunfigLifecycleHook,
   type BunrepoConfig,
@@ -5,8 +6,10 @@ import {
   getPackageJson,
 } from '@ldlabs/utils';
 import { file } from 'bun';
-import type { Task, Workload } from '../types/workload';
+import { logger } from '../logger';
+import type { WorkspaceWorkload } from '../types/workload';
 
+const { error, info, log } = logger();
 const VALID_TRIGGERS: Record<BunfigLifecycleHook, true> = {
   pullrequest: true,
   build: true,
@@ -17,21 +20,23 @@ const VALID_TRIGGERS: Record<BunfigLifecycleHook, true> = {
 
 type Args = {
   workspaces: string[];
-  passthroughs: string[];
   all: boolean;
   trigger: string;
-  log: boolean;
 };
 
-export async function getTasks({ all, log, trigger, workspaces, passthroughs }: Args) {
+export async function getTasks({ all, trigger, workspaces }: Args) {
   const errors: string[] = [];
 
   if (!trigger || !VALID_TRIGGERS[trigger as BunfigLifecycleHook]) {
-    console.error(
+    error(
       `No valid trigger provided. Valid options: ${Object.keys(VALID_TRIGGERS).join(
         ', ',
       )}. Received: ${trigger ?? 'undefined'}`,
     );
+    if (process.env.CI) {
+      setFailed('No lifecycle trigger provided.');
+      return;
+    }
     process.exit(-1);
   }
 
@@ -49,23 +54,17 @@ export async function getTasks({ all, log, trigger, workspaces, passthroughs }: 
   }
 
   if (workspaces?.length === 0) {
-    if (log) {
-      console.warn('No workspaces provided, terminating early.');
-    }
+    info('No workspaces provided, terminating early.');
     process.exit(-1);
   }
 
-  const workload: Workload = {
-    workloads: [],
-  };
+  const workspaceWorkloads: WorkspaceWorkload[] = [];
 
   for (const ws of includedWorkspaces) {
     try {
       await file(`${ws.cwd}/bunrepo.config.ts`).stat();
     } catch {
-      if (log) {
-        console.warn(`No bunrepo config file found for workspace: ${ws.name}`);
-      }
+      info(`No bunrepo config file found for workspace: ${ws.name}`);
       continue;
     }
 
@@ -80,26 +79,31 @@ export async function getTasks({ all, log, trigger, workspaces, passthroughs }: 
       const wsTasks = resolvedConfig.tasks[trigger as keyof BunrepoConfig['tasks']];
 
       if (wsTasks) {
-        workload.workloads.push({
+        workspaceWorkloads.push({
+          name: `Run ${ws.name} Tasks`,
           cwd: ws.cwd,
-          isParallel: false, // TODO make this configurable
           workspace: ws.name,
-          tasks: wsTasks.map((cmd) => {
-            return {
-              name: `(${ws.name}) - ${cmd}`,
-              cmd: cmd.join(' '),
-              passthroughs,
-              argv: [], // TODO idk if we need this
-            } satisfies Task;
-          }),
+          tasks: wsTasks,
         });
       }
     } catch (err) {
-      if (log) {
-        console.log(`Unable to resolve ${ws.name} config`, err);
-      }
+      log(`Unable to resolve ${ws.name} config | error: ${err}`);
     }
   }
 
-  console.log(JSON.stringify({ workload, errors }));
+  // output for github CI, the matrix accepts an "include" parameter from a json object
+  const tasksObject = JSON.stringify({ workloads: { include: workspaceWorkloads }, errors });
+  info(`Task generation output: ${tasksObject}`);
+
+  if (errors.length > 0) {
+    error(`Task generation failed, errors: ${errors}`);
+    if (process.env.CI) {
+      setFailed(`Task generation failed, errors: ${errors}`);
+    }
+    return;
+  }
+
+  if (process.env.CI) {
+    setOutput('tasks', { include: workspaceWorkloads });
+  }
 }

@@ -1,11 +1,11 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import pool from '../../utils/db-pool';
-import logger from '../../utils/logger';
 import type { RequestHandler } from 'express';
+import jwt from 'jsonwebtoken';
+import type { StringValue } from 'ms';
 import type { UserRecord } from '../../types/db-types';
 import type { JwtTokenContent } from '../../types/token-types';
-import type { StringValue } from 'ms';
+import pool from '../../utils/db-pool';
+import logger from '../../utils/logger';
 
 const login: RequestHandler<unknown, unknown, { username?: string; password?: string }> = async (
   req,
@@ -169,7 +169,7 @@ const refresh: RequestHandler = async (req, res) => {
           code: ERRS.CGQL_0010,
         });
       }
-      return
+      return;
     }
 
     try {

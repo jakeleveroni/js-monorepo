@@ -1,5 +1,5 @@
-import { Pool } from "pg";
-import logger from "./logger";
+import { Pool } from 'pg';
+import logger from './logger';
 
 const pool = new Pool({
   user: process.env.DB_USERNAME,
@@ -9,8 +9,8 @@ const pool = new Pool({
   database: process.env.DB_NAME,
 });
 
-pool.on("error", (err, client) => {
-  logger.error(err, "Unexpected error on idle client", err);
+pool.on('error', (err, client) => {
+  logger.error(err, 'Unexpected error on idle client', err);
   client.release();
 });
 

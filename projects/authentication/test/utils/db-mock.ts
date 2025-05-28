@@ -23,7 +23,7 @@ mock.module('pg', () => {
 function readSchema() {
   try {
     // bun module mocking needs synchronous functions
-    return readFileSync(__dirname + '/../../../database/init/pgmem-schema.sql').toString('utf-8');
+    return readFileSync(`${__dirname}/../../../database/init/pgmem-schema.sql`).toString('utf-8');
   } catch (err) {
     console.error('Unable to read schema file for db initialization.', err);
     return undefined;
