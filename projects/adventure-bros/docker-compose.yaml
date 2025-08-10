@@ -1,0 +1,23 @@
+services:
+  adv-bros-postgres:
+    image: postgres:latest
+    container_name: adv-bros-postgres
+    restart: unless-stopped
+    ports:
+      - "1338:5432"
+    environment:
+      POSTGRES_DB: ${PGDATABASE:-adventure_bros}
+      POSTGRES_USER: ${ROOT_PGUSERNAME:-postgres}
+      POSTGRES_PASSWORD: ${ROOT_PGPASSWORD:-password}
+    volumes:
+      - ./database/db-init:/docker-entrypoint-initdb.d
+      - adventure_bros_data:/var/lib/postgresql/data
+    networks:
+      - adv-bros-network
+
+volumes:
+  adventure_bros_data:
+
+networks:
+  adv-bros-network:
+    driver: bridge
