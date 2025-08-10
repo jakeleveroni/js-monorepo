@@ -1,4 +1,6 @@
 import { serve } from 'bun';
+import SubmissionRoutes from './backend/api/submission-routes';
+import VolunteerRoutes from './backend/api/volunteer-routes';
 import index from './index.html';
 
 const server = serve({
@@ -6,26 +8,16 @@ const server = serve({
     // Serve index.html for all unmatched routes.
     '/*': index,
 
-    '/api/hello': {
-      async GET(req) {
-        return Response.json({
-          message: 'Hello, world!',
-          method: 'GET',
-        });
-      },
-      async PUT(req) {
-        return Response.json({
-          message: 'Hello, world!',
-          method: 'PUT',
-        });
+    '/api/volunteer': {
+      async POST(req) {
+        return VolunteerRoutes.createVolunteerRequest(req);
       },
     },
 
-    '/api/hello/:name': async (req) => {
-      const name = req.params.name;
-      return Response.json({
-        message: `Hello, ${name}!`,
-      });
+    '/api/submission': {
+      async POST(req) {
+        return SubmissionRoutes.createHelpRequest(req);
+      },
     },
   },
 
