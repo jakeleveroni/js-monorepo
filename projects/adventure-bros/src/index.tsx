@@ -1,7 +1,7 @@
 import { serve } from 'bun';
-import index from './index.html';
-import VolunteerRoutes from './backend/api/volunteer-routes';
 import SubmissionRoutes from './backend/api/submission-routes';
+import VolunteerRoutes from './backend/api/volunteer-routes';
+import index from './index.html';
 
 const server = serve({
   routes: {
@@ -10,15 +10,15 @@ const server = serve({
 
     '/api/volunteer': {
       async POST(req) {
-        return VolunteerRoutes.createVolunteerRequest(req)
+        return VolunteerRoutes.createVolunteerRequest(req);
       },
     },
 
     '/api/submission': {
       async POST(req) {
-        return SubmissionRoutes.createHelpRequest(req)
+        return SubmissionRoutes.createHelpRequest(req);
       },
-    }
+    },
   },
 
   development: process.env.NODE_ENV !== 'production' && {
